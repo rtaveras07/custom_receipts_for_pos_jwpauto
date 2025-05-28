@@ -7,22 +7,7 @@
         <div class="pos-receipt">
             <div class="pos-receipt-contact">
                 <t t-if="props.data.headerData.company.name">
-                    <div><t t-esc="props.data.headerData.company.name" /></div>
-                </t>
-                <t t-if="props.data.headerData.company.phone">
-                    <div>Tel:<t t-esc="props.data.headerData.company.phone" /></div>
-                </t>
-                <t t-if="props.data.headerData.company.vat">
-                    <div><t t-esc="props.data.headerData.company.vat_label"/>:<t t-esc="props.data.headerData.company.vat" /></div>
-                </t>
-                <t t-if="props.data.headerData.company.email">
-                    <div><t t-esc="props.data.headerData.company.email" /></div>
-                </t>
-                <t t-if="props.data.headerData.company.website">
-                    <div><t t-esc="props.data.headerData.company.website" /></div>
-                </t>
-                <t t-if="props.receipt.headerData.header">
-                    <t t-out="props.receipt.headerData.header" />
+                    <div><strong style="font-size:18px;"><t t-esc="props.data.headerData.company.name" /></strong></div>
                 </t>
                 <t t-if="props.receipt.headerData.cashier">
                     <div class="cashier">
@@ -35,27 +20,36 @@
                 </t>
             </div>
             <br/>
+            <div style="text-align: center; font-size: 12px;">
+                ING. GUZMÁN ABREU ESQ. BONÓ #8
+            </div>
+            <div style="text-align: center; font-size: 12px;">
+                San Francisco de Macorís, Duarte.
+            </div>
+            <div style="text-align: center; font-size: 12px;">
+                Cel.: 849-281-5893
+            </div>
             <!-- Información del Cliente -->
-<div class="pos-receipt-customer" style="font-size:14px; margin-top:10px;">
-    <t t-if="props.partner">
-        <div><strong>Cliente:</strong> <t t-esc="props.partner.name"/></div>
-        <t t-if="props.partner.vat">
-            <div><strong>RNC/Cédula:</strong> <t t-esc="props.partner.vat"/></div>
-        </t>
-        <t t-if="props.partner.street">
-            <div><strong>Dirección:</strong> <t t-esc="props.partner.street"/></div>
-        </t>
-        <t t-if="props.partner.city">
-            <div><strong>Ciudad:</strong> <t t-esc="props.partner.city"/></div>
-        </t>
-        <t t-if="props.partner.phone">
-            <div><strong>Teléfono:</strong> <t t-esc="props.partner.phone"/></div>
-        </t>
-        <t t-if="props.partner.email">
-            <div><strong>Email:</strong> <t t-esc="props.partner.email"/></div>
-        </t>
-    </t>
-</div>
+            <div class="pos-receipt-customer" style="font-size:14px; margin-top:10px;">
+                <t t-if="props.partner">
+                    <div><strong>Cliente:</strong> <t t-esc="props.partner.name"/></div>
+                    <t t-if="props.partner.vat">
+                        <div><strong>RNC/Cédula:</strong> <t t-esc="props.partner.vat"/></div>
+                    </t>
+                    <t t-if="props.partner.street">
+                        <div><strong>Dirección:</strong> <t t-esc="props.partner.street"/></div>
+                    </t>
+                    <t t-if="props.partner.city">
+                        <div><strong>Ciudad:</strong> <t t-esc="props.partner.city"/></div>
+                    </t>
+                    <t t-if="props.partner.phone">
+                        <div><strong>Teléfono:</strong> <t t-esc="props.partner.phone"/></div>
+                    </t>
+                    <t t-if="props.partner.email">
+                        <div><strong>Email:</strong> <t t-esc="props.partner.email"/></div>
+                    </t>
+                </t>
+            </div>
             <t t-if="props.receipt.headerData.header">
                 <div style='text-align:center; font-size:13px'>
                     <t t-esc="props.receipt.headerData.header" />
@@ -65,13 +59,15 @@
             <div>
                 <table class='receipt-orderlines' style="font-size:15px; border-style:double; border-left:none; border-right:none; border-bottom:none; width:100%;">
                     <colgroup>
-                        <col width='40%' />
+                        <col width='30%' />
+                        <col width='10%' />
                         <col width='30%' />
                         <col width='30%' />
                     </colgroup>
                     <tr style="border-bottom:1px dashed black;">
                         <th style="text-align:left;">Product</th>
                         <th style="text-align:right;">Qty</th>
+                        <th style="text-align:right;">Price</th>
                         <th style="text-align:right;">Amount</th>
                     </tr>
                     <t t-if="props.order and props.order.length and props.order[0] and props.order[0].pos and props.order[0].pos.mainScreen and props.order[0].pos.mainScreen.props and props.order[0].pos.mainScreen.props.order and props.order[0].pos.mainScreen.props.order.orderlines and props.order[0].pos.mainScreen.props.order.orderlines.length">
@@ -89,10 +85,13 @@
                                     </t>
                                 </td>
                                 <td style="text-align:right; font-size:14px;">
-                                    <t t-esc="orderline.qty "/>
+                                    <t t-esc="orderline.qty"/>
                                 </td>
                                 <td style="text-align:right; font-size:14px;">
                                     <t t-esc="orderline.unitPrice"/>
+                                </td>
+                                <td style="text-align:right; font-size:14px;">
+                                    <t t-esc="orderline.price" />
                                 </td>
                             </tr>
                         </t>
@@ -117,10 +116,12 @@
                                 <td style="text-align:right; font-size:14px;">
                                     <t t-esc="orderline.unitPrice"/>
                                 </td>
+                                <td style="text-align:right; font-size:14px;">
+                                    <t t-esc="orderline.price" />
+                                </td>
                             </tr>
                         </t>
                     </t>
-
                 </table>
             </div>
             <br />
@@ -153,18 +154,17 @@
             <br/><br/>
             <!-- Footer -->
             <div class="pos-receipt-order-data">
-                <div><t t-esc="props.receipt.name" />
-            </div>
-            <t t-if="props.receipt.date">
-                <div><t t-esc="props.receipt.date" /></div>
-            </t>
-            <t t-else="">
-                <div><t t-esc="props.receipt.date" /></div>
-            </t>
+                <div><t t-esc="props.receipt.name" /></div>
+                <t t-if="props.receipt.date">
+                    <div><t t-esc="props.receipt.date" /></div>
+                </t>
+                <t t-else="">
+                    <div><t t-esc="props.receipt.date" /></div>
+                </t>
             </div>
             <br/><br/>
             <div style="font-size:14px; text-align:center;">
-                Thank You... Please Visit Again ...
+                ENSUCIA A CONFIANZA, QUE NOSOTROS RESOLVEMOS.....
             </div>
         </div>]]></field>
     </record>
