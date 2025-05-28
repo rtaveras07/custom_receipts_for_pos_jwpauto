@@ -25,7 +25,7 @@ patch(OrderReceipt.prototype, {
             phone: partner.phone,
             email: partner.email,
             // ...otros campos necesarios
-        } : { name: "Cliente no asignado" };  // Partner por defecto
+        } : { name: "" };  // Partner por defecto
     
         return {
             pos: this.pos,

@@ -5,19 +5,13 @@
         <field name="name">Design 1</field>
         <field name="design_receipt"><![CDATA[
         <div class="pos-receipt">
+          
+
             <div class="pos-receipt-contact">
                 <t t-if="props.data.headerData.company.name">
                     <div><strong style="font-size:18px;"><t t-esc="props.data.headerData.company.name" /></strong></div>
                 </t>
-                <t t-if="props.receipt.headerData.cashier">
-                    <div class="cashier">
-                        <div>--------------------------------</div>
-                        <div>Served by <t t-esc="props.receipt.headerData.cashier" /></div>
-                    </div>
-                    <div class="fw-bolder" t-if="props.data.headerData.trackingNumber">
-                        <span class="fs-2" t-esc="props.data.headerData.trackingNumber" />
-                    </div>
-                </t>
+               
             </div>
             <br/>
             <div style="text-align: center; font-size: 12px;">
@@ -29,9 +23,20 @@
             <div style="text-align: center; font-size: 12px;">
                 Cel.: 849-281-5893
             </div>
+            <div style="text-align: center; font-size: 12px;">
+             <t t-if="props.receipt.headerData.cashier">
+                    <div class="cashier">
+                        <div>--------------------------------</div>
+                        <div>Atendido por <t t-esc="props.receipt.headerData.cashier" /></div>
+                    </div>
+                    <div class="fw-bolder" t-if="props.data.headerData.trackingNumber">
+                        <span class="fs-2" t-esc="props.data.headerData.trackingNumber" />
+                    </div>
+                </t>
+            </div>
             <!-- Información del Cliente -->
             <div class="pos-receipt-customer" style="font-size:14px; margin-top:10px;">
-                <t t-if="props.partner">
+                <t t-if="props.partner and props.partner.name != ''">
                     <div><strong>Cliente:</strong> <t t-esc="props.partner.name"/></div>
                     <t t-if="props.partner.vat">
                         <div><strong>RNC/Cédula:</strong> <t t-esc="props.partner.vat"/></div>
@@ -125,6 +130,18 @@
                 </table>
             </div>
             <br />
+             <t t-if="props.receipt.paymentlines and props.receipt.paymentlines.length">
+    <div style="border-top:1px dashed black; font-weight: 600; font-size:14px; margin-top:10px;">
+        <div>Método(s) de pago:</div>
+        <t t-foreach="props.receipt.paymentlines" t-as="payline" t-key="payline.cid">
+            <div style="display: flex; justify-content: space-between;">
+                <span><t t-esc="payline.name"/></span>
+                <span><t t-esc="props.pos.env.utils.formatCurrency(payline.amount)"/></span>
+            </div>
+        </t>
+    </div>
+</t>
+              
             <div style="padding-top:6px;">
                 <t t-set='taxincluded' t-value='Math.abs(props.receipt.amount_total - props.receipt.total_with_tax) &lt;= 0.000001' />
                 <t t-if='!taxincluded'>
