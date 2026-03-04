@@ -41,13 +41,17 @@
                 <table class='receipt-orderlines' style="font-size:15px; border-style:double;
             border-left:none; border-right:none; border-bottom:none; width:100%;">
                 <colgroup>
-                    <col width='40%' />
-                    <col width='30%' />
-                    <col width='30%' />
+                    <col width='26%' />
+                    <col width='10%' />
+                    <col width='14%' />
+                    <col width='25%' />
+                    <col width='25%' />
                 </colgroup>
                 <tr style="border-bottom:1px dashed black;">
                     <th style="text-align:left;">Product</th>
                     <th style="text-align:right;">Qty</th>
+                    <th style="text-align:right;">U/M</th>
+                    <th style="text-align:right;">Price</th>
                     <th style="text-align:right;">Amount</th>
                 </tr>
                 <t t-if="props.order and props.order.length and props.order[0] and props.order[0].pos and props.order[0].pos.mainScreen and props.order[0].pos.mainScreen.props and props.order[0].pos.mainScreen.props.order and props.order[0].pos.mainScreen.props.order.orderlines and props.order[0].pos.mainScreen.props.order.orderlines.length">
@@ -68,7 +72,13 @@
                                     <t t-esc="orderline.qty"/>
                                 </td>
                                 <td style="text-align:right; font-size:14px;">
+                                    <t t-esc="orderline.unit_name || orderline.unitName || orderline.unit || '-'"/>
+                                </td>
+                                <td style="text-align:right; font-size:14px;">
                                     <t t-esc="orderline.unitPrice"/>
+                                </td>
+                                <td style="text-align:right; font-size:14px;">
+                                    <t t-esc="orderline.price || orderline.priceDisplay || orderline.unitPrice"/>
                                 </td>
                             </tr>
                         </t>
@@ -91,7 +101,13 @@
                                     <t t-esc="orderline.qty"/>
                                 </td>
                                 <td style="text-align:right; font-size:14px;">
+                                    <t t-esc="orderline.unit_name || orderline.unitName || orderline.unit || '-'"/>
+                                </td>
+                                <td style="text-align:right; font-size:14px;">
                                     <t t-esc="orderline.unitPrice"/>
+                                </td>
+                                <td style="text-align:right; font-size:14px;">
+                                    <t t-esc="orderline.price || orderline.priceDisplay || orderline.unitPrice"/>
                                 </td>
                             </tr>
                         </t>

@@ -41,6 +41,7 @@ patch(OrderReceipt.prototype, {
             template: true,
             fiscal_number: "",
             ncf_sequence_number: "",
+            ncf_expiration_date: "",
         })
         this.pos = useState(useService("pos"));
         this.orm = useService("orm");
@@ -67,6 +68,11 @@ patch(OrderReceipt.prototype, {
                 receiptData.ncf_sequence_number ||
                 (fiscal_number ? fiscal_number.replace(/^[A-Z]+/, "") : "");
 
+            let ncf_expiration_date =
+                receiptData.ncf_expiration_date ||
+                receiptData.l10n_do_ncf_expiration_date ||
+                (order ? (order.ncf_expiration_date || order.l10n_do_ncf_expiration_date || "") : "");
+
             if (!fiscal_number) {
                 try {
                     const backendFiscalData = await this.orm.call(
@@ -76,6 +82,7 @@ patch(OrderReceipt.prototype, {
                     );
                     fiscal_number = backendFiscalData.ncf || fiscal_number;
                     ncf_sequence_number = backendFiscalData.ncf_sequence_number || ncf_sequence_number;
+                    ncf_expiration_date = backendFiscalData.ncf_expiration_date || ncf_expiration_date;
                 } catch (_error) {
                     // Fallback silencioso: usar datos locales si no hay RPC
                 }
@@ -84,6 +91,7 @@ patch(OrderReceipt.prototype, {
             this.state.fiscal_number = fiscal_number || "";
             this.state.ncf_sequence_number =
                 ncf_sequence_number || (this.state.fiscal_number ? this.state.fiscal_number.replace(/^[A-Z]+/, "") : "");
+            this.state.ncf_expiration_date = ncf_expiration_date || "";
         });
     },
     get templateProps() {
@@ -113,12 +121,21 @@ patch(OrderReceipt.prototype, {
             this.state.ncf_sequence_number ||
             (fiscal_number ? fiscal_number.replace(/^[A-Z]+/, '') : '') ||
             '';
+        const ncf_expiration_date =
+            receiptData.ncf_expiration_date ||
+            receiptData.l10n_do_ncf_expiration_date ||
+            orderPrintingData.ncf_expiration_date ||
+            this.state.ncf_expiration_date ||
+            '';
 
         if (!receiptData.ncf && fiscal_number) {
             receiptData.ncf = fiscal_number;
         }
         if (!receiptData.ncf_sequence_number && ncf_sequence_number) {
             receiptData.ncf_sequence_number = ncf_sequence_number;
+        }
+        if (!receiptData.ncf_expiration_date && ncf_expiration_date) {
+            receiptData.ncf_expiration_date = ncf_expiration_date;
         }
 
         return {
@@ -131,6 +148,7 @@ patch(OrderReceipt.prototype, {
             partner: partnerData,
             l10n_do_fiscal_number: fiscal_number,
             l10n_do_ncf_sequence_number: ncf_sequence_number,
+            l10n_do_ncf_expiration_date: ncf_expiration_date,
         };
     },
     get templateComponent() {

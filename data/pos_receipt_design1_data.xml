@@ -11,17 +11,30 @@
                 <t t-if="props.data.headerData.company.name">
                     <div><strong style="font-size:18px;"><t t-esc="props.data.headerData.company.name" /></strong></div>
                 </t>
+                <t t-if="(props.data.headerData.company and props.data.headerData.company.vat) || (props.pos and props.pos.company and props.pos.company.vat)">
+                    <div style="font-size:12px;">
+                        <strong>RNC:</strong>
+                        <t t-esc="(props.data.headerData.company and props.data.headerData.company.vat) || (props.pos and props.pos.company and props.pos.company.vat)"/>
+                    </div>
+                </t>
                
             </div>
             <br/>
-            <div style="text-align: center; font-size: 12px;">
-                ING. GUZMÁN ABREU ESQ. BONÓ #8
+            <t t-set="company_info" t-value="(props.data.headerData and props.data.headerData.company) || (props.pos and props.pos.company) || {}"/>
+            <div style="text-align: center; font-size: 12px;" t-if="company_info.street || company_info.street2">
+                <t t-esc="company_info.street || ''"/>
+                <t t-if="company_info.street and company_info.street2">, </t>
+                <t t-esc="company_info.street2 || ''"/>
             </div>
-            <div style="text-align: center; font-size: 12px;">
-                San Francisco de Macorís, Duarte.
+            <div style="text-align: center; font-size: 12px;" t-if="company_info.city || company_info.state_name || company_info.country_name">
+                <t t-esc="company_info.city || ''"/>
+                <t t-if="company_info.city and (company_info.state_name || company_info.country_name)">, </t>
+                <t t-esc="company_info.state_name || ''"/>
+                <t t-if="company_info.state_name and company_info.country_name">, </t>
+                <t t-esc="company_info.country_name || ''"/>
             </div>
-            <div style="text-align: center; font-size: 12px;">
-                Cel.: 849-281-5893
+            <div style="text-align: center; font-size: 12px;" t-if="company_info.phone || company_info.mobile">
+                Tel.: <t t-esc="company_info.phone || company_info.mobile"/>
             </div>
             <div style="text-align: center; font-size: 12px;">
              <t t-if="props.receipt.headerData.cashier">
@@ -60,6 +73,10 @@
                     <div>
                         <strong>NCF:</strong>
                         <t t-esc="props.data.ncf || props.l10n_do_fiscal_number"/>
+                        <t t-if="props.data.ncf_expiration_date || props.l10n_do_ncf_expiration_date">
+                            <span> | Vence: </span>
+                            <t t-esc="props.data.ncf_expiration_date || props.l10n_do_ncf_expiration_date"/>
+                        </t>
                     </div>
                     <t t-if="props.data.ncf_sequence_number || props.l10n_do_ncf_sequence_number">
                          
@@ -75,20 +92,25 @@
             <div>
                 <table class='receipt-orderlines' style="font-size:15px; border-style:double; border-left:none; border-right:none; border-bottom:none; width:100%;">
                     <colgroup>
-                        <col width='30%' />
                         <col width='10%' />
-                        <col width='30%' />
-                        <col width='30%' />
+                        <col width='26%' />
+                        <col width='14%' />
+                        <col width='25%' />
+                        <col width='25%' />
                     </colgroup>
                     <tr style="border-bottom:1px dashed black;">
-                        <th style="text-align:left;">Product</th>
                         <th style="text-align:right;">Qty</th>
+                        <th style="text-align:left;">Product</th>
+                        <th style="text-align:right;">U/M</th>
                         <th style="text-align:right;">Price</th>
                         <th style="text-align:right;">Amount</th>
                     </tr>
                     <t t-if="props.order and props.order.length and props.order[0] and props.order[0].pos and props.order[0].pos.mainScreen and props.order[0].pos.mainScreen.props and props.order[0].pos.mainScreen.props.order and props.order[0].pos.mainScreen.props.order.orderlines and props.order[0].pos.mainScreen.props.order.orderlines.length">
                         <t t-if="props.order[0].pos.mainScreen.props">
                             <tr t-foreach="props.orderlines" t-as="orderline" t-key="orderline_index">
+                                <td style="text-align:right; font-size:14px;">
+                                    <t t-esc="orderline.qty"/>
+                                </td>
                                 <td style="padding-top:1%; padding-bottom:1%; text-align:left;">
                                     <t t-esc="orderline.productName"/>
                                     <t t-if="orderline.discount > 0">
@@ -101,7 +123,7 @@
                                     </t>
                                 </td>
                                 <td style="text-align:right; font-size:14px;">
-                                    <t t-esc="orderline.qty"/>
+                                    <t t-esc="orderline.unit_name || orderline.unitName || orderline.unit || '-'"/>
                                 </td>
                                 <td style="text-align:right; font-size:14px;">
                                     <t t-esc="orderline.unitPrice"/>
@@ -115,6 +137,9 @@
                     <t t-else="">
                         <t t-if="props.orderlines and props.orderlines.length">
                             <tr t-foreach="props.orderlines" t-as="orderline" t-key="orderline_index">
+                                <td style="text-align:right; font-size:14px;">
+                                    <t t-esc="orderline.qty"/>
+                                </td>
                                 <td style="padding-top:1%; padding-bottom:1%; text-align:left;">
                                     <t t-esc="orderline.productName"/>
                                     <t t-if="orderline.discount > 0">
@@ -127,7 +152,7 @@
                                     </t>
                                 </td>
                                 <td style="text-align:right; font-size:14px;">
-                                    <t t-esc="orderline.qty"/>
+                                    <t t-esc="orderline.unit_name || orderline.unitName || orderline.unit || '-'"/>
                                 </td>
                                 <td style="text-align:right; font-size:14px;">
                                     <t t-esc="orderline.unitPrice"/>

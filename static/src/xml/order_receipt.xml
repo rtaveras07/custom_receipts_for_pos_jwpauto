@@ -8,6 +8,10 @@
                     <div class="pos-receipt-order-data">
                         <strong>Comprobante Fiscal:</strong>
                         <span t-esc="props.data.ncf || props.l10n_do_fiscal_number"/>
+                        <t t-if="props.data.ncf_expiration_date || props.l10n_do_ncf_expiration_date">
+                            <span> | Vence: </span>
+                            <span t-esc="props.data.ncf_expiration_date || props.l10n_do_ncf_expiration_date"/>
+                        </t>
                     </div>
                     <div class="pos-receipt-order-data" t-if="props.data.ncf_sequence_number || props.l10n_do_ncf_sequence_number">
                         <strong>Secuencia:</strong>
