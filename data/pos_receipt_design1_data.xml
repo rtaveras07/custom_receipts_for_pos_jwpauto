@@ -70,6 +70,12 @@
             </div>
             <t t-if="props.data.ncf || props.l10n_do_fiscal_number">
                 <div class="pos-receipt-customer" style="font-size:14px; margin-top:8px; border-top:1px dashed black; padding-top:6px;">
+                    <t t-if="props.data.fiscal_type_name || props.l10n_do_fiscal_type_name || (props.data.fiscal_type and props.data.fiscal_type.name)">
+                        <div>
+                            <strong>Tipo de factura:</strong>
+                            <t t-esc="props.data.fiscal_type_name || props.l10n_do_fiscal_type_name || (props.data.fiscal_type and props.data.fiscal_type.name)"/>
+                        </div>
+                    </t>
                     <div>
                         <strong>NCF:</strong>
                         <t t-esc="props.data.ncf || props.l10n_do_fiscal_number"/>

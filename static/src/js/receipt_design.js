@@ -42,6 +42,7 @@ patch(OrderReceipt.prototype, {
             fiscal_number: "",
             ncf_sequence_number: "",
             ncf_expiration_date: "",
+            fiscal_type_name: "",
         })
         this.pos = useState(useService("pos"));
         this.orm = useService("orm");
@@ -73,7 +74,13 @@ patch(OrderReceipt.prototype, {
                 receiptData.l10n_do_ncf_expiration_date ||
                 (order ? (order.ncf_expiration_date || order.l10n_do_ncf_expiration_date || "") : "");
 
-            if (!fiscal_number) {
+            let fiscal_type_name =
+                (receiptData.fiscal_type && receiptData.fiscal_type.name) ||
+                receiptData.fiscal_type_name ||
+                (order && order.fiscal_type && order.fiscal_type.name) ||
+                "";
+
+            if (!fiscal_number || !ncf_expiration_date || !fiscal_type_name) {
                 try {
                     const backendFiscalData = await this.orm.call(
                         "pos.order",
@@ -83,6 +90,7 @@ patch(OrderReceipt.prototype, {
                     fiscal_number = backendFiscalData.ncf || fiscal_number;
                     ncf_sequence_number = backendFiscalData.ncf_sequence_number || ncf_sequence_number;
                     ncf_expiration_date = backendFiscalData.ncf_expiration_date || ncf_expiration_date;
+                    fiscal_type_name = backendFiscalData.fiscal_type_name || fiscal_type_name;
                 } catch (_error) {
                     // Fallback silencioso: usar datos locales si no hay RPC
                 }
@@ -92,6 +100,7 @@ patch(OrderReceipt.prototype, {
             this.state.ncf_sequence_number =
                 ncf_sequence_number || (this.state.fiscal_number ? this.state.fiscal_number.replace(/^[A-Z]+/, "") : "");
             this.state.ncf_expiration_date = ncf_expiration_date || "";
+            this.state.fiscal_type_name = fiscal_type_name || "";
         });
     },
     get templateProps() {
@@ -127,6 +136,38 @@ patch(OrderReceipt.prototype, {
             orderPrintingData.ncf_expiration_date ||
             this.state.ncf_expiration_date ||
             '';
+        const fiscal_type =
+            receiptData.fiscal_type ||
+            orderPrintingData.fiscal_type ||
+            (order ? order.fiscal_type : false) ||
+            false;
+        let fiscal_type_name =
+            (fiscal_type && fiscal_type.name) ||
+            receiptData.fiscal_type_name ||
+            (receiptData.fiscal_type && receiptData.fiscal_type.name) ||
+            this.state.fiscal_type_name ||
+            '';
+
+        if (!fiscal_type_name && fiscal_number) {
+            const prefix = fiscal_number.slice(0, 3);
+            const prefixMap = {
+                E31: 'B01',
+                E32: 'B02',
+                E33: 'B03',
+                E34: 'B04',
+                E41: 'B11',
+                E43: 'B13',
+                E44: 'B14',
+                E45: 'B15',
+                E46: 'B16',
+                E47: 'B17',
+            };
+            const normalizedPrefix = prefixMap[prefix] || prefix;
+            const fiscalTypeByPrefix = (this.pos.fiscal_types || []).find((item) => item.prefix === normalizedPrefix);
+            if (fiscalTypeByPrefix && fiscalTypeByPrefix.name) {
+                fiscal_type_name = fiscalTypeByPrefix.name;
+            }
+        }
 
         if (!receiptData.ncf && fiscal_number) {
             receiptData.ncf = fiscal_number;
@@ -136,6 +177,12 @@ patch(OrderReceipt.prototype, {
         }
         if (!receiptData.ncf_expiration_date && ncf_expiration_date) {
             receiptData.ncf_expiration_date = ncf_expiration_date;
+        }
+        if (!receiptData.fiscal_type && fiscal_type) {
+            receiptData.fiscal_type = fiscal_type;
+        }
+        if (!receiptData.fiscal_type_name && fiscal_type_name) {
+            receiptData.fiscal_type_name = fiscal_type_name;
         }
 
         return {
@@ -149,6 +196,8 @@ patch(OrderReceipt.prototype, {
             l10n_do_fiscal_number: fiscal_number,
             l10n_do_ncf_sequence_number: ncf_sequence_number,
             l10n_do_ncf_expiration_date: ncf_expiration_date,
+            l10n_do_fiscal_type: fiscal_type,
+            l10n_do_fiscal_type_name: fiscal_type_name,
         };
     },
     get templateComponent() {

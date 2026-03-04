@@ -22,6 +22,7 @@ class PosOrder(models.Model):
                 'ncf': '',
                 'ncf_sequence_number': '',
                 'ncf_expiration_date': False,
+                'fiscal_type_name': '',
                 'order_id': False,
             }
 
@@ -50,10 +51,18 @@ class PosOrder(models.Model):
         if move and not expiration_date:
             expiration_date = move.l10n_do_ncf_expiration_date or False
 
+        fiscal_type_name = ''
+        if 'fiscal_type_id' in order._fields and order.fiscal_type_id:
+            fiscal_type_name = order.fiscal_type_id.name or ''
+
+        if not fiscal_type_name and move and move.l10n_latam_document_type_id:
+            fiscal_type_name = move.l10n_latam_document_type_id.display_name or ''
+
         sequence_number = re.sub(r'^[A-Z]+', '', ncf or '')
         return {
             'ncf': ncf or '',
             'ncf_sequence_number': sequence_number,
             'ncf_expiration_date': expiration_date,
+            'fiscal_type_name': fiscal_type_name,
             'order_id': order.id,
         }
