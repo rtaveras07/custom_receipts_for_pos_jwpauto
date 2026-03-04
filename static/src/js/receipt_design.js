@@ -150,22 +150,37 @@ patch(OrderReceipt.prototype, {
 
         if (!fiscal_type_name && fiscal_number) {
             const prefix = fiscal_number.slice(0, 3);
-            const prefixMap = {
-                E31: 'B01',
-                E32: 'B02',
-                E33: 'B03',
-                E34: 'B04',
-                E41: 'B11',
-                E43: 'B13',
-                E44: 'B14',
-                E45: 'B15',
-                E46: 'B16',
-                E47: 'B17',
-            };
-            const normalizedPrefix = prefixMap[prefix] || prefix;
-            const fiscalTypeByPrefix = (this.pos.fiscal_types || []).find((item) => item.prefix === normalizedPrefix);
+            const fiscalTypes = this.pos.fiscal_types || [];
+
+            let fiscalTypeByPrefix = fiscalTypes.find((item) => item.prefix === prefix);
+
+            if (!fiscalTypeByPrefix) {
+                const prefixMap = {
+                    E31: 'B01',
+                    E32: 'B02',
+                    E33: 'B03',
+                    E34: 'B04',
+                    E41: 'B11',
+                    E43: 'B13',
+                    E44: 'B14',
+                    E45: 'B15',
+                    E46: 'B16',
+                    E47: 'B17',
+                };
+                const normalizedPrefix = prefixMap[prefix] || prefix;
+                fiscalTypeByPrefix = fiscalTypes.find((item) => item.prefix === normalizedPrefix);
+            }
+
             if (fiscalTypeByPrefix && fiscalTypeByPrefix.name) {
                 fiscal_type_name = fiscalTypeByPrefix.name;
+            }
+        }
+
+        if (fiscal_type_name && fiscal_number) {
+            const prefix = fiscal_number.slice(0, 1);
+            const lowerName = fiscal_type_name.toLowerCase();
+            if (prefix === 'E' && !lowerName.includes('electronic') && !lowerName.includes('electrónic') && !lowerName.includes('electronica') && !lowerName.includes('electrónica')) {
+                fiscal_type_name = `${fiscal_type_name} Electrónica`;
             }
         }
 
@@ -182,6 +197,8 @@ patch(OrderReceipt.prototype, {
             receiptData.fiscal_type = fiscal_type;
         }
         if (!receiptData.fiscal_type_name && fiscal_type_name) {
+            receiptData.fiscal_type_name = fiscal_type_name;
+        } else if (receiptData.fiscal_type_name && fiscal_type_name && receiptData.fiscal_type_name !== fiscal_type_name) {
             receiptData.fiscal_type_name = fiscal_type_name;
         }
 

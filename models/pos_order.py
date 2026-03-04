@@ -52,11 +52,21 @@ class PosOrder(models.Model):
             expiration_date = move.l10n_do_ncf_expiration_date or False
 
         fiscal_type_name = ''
-        if 'fiscal_type_id' in order._fields and order.fiscal_type_id:
-            fiscal_type_name = order.fiscal_type_id.name or ''
-
-        if not fiscal_type_name and move and move.l10n_latam_document_type_id:
+        if move and move.l10n_latam_document_type_id:
             fiscal_type_name = move.l10n_latam_document_type_id.display_name or ''
+
+        if not fiscal_type_name and ncf and 'config_id' in order._fields and order.config_id and order.config_id.invoice_journal_id:
+            prefix = (ncf or '')[:3]
+            journal = order.config_id.invoice_journal_id
+            journal_doc = journal.l10n_do_document_type_ids.filtered(
+                lambda line: line.l10n_latam_document_type_id
+                and line.l10n_latam_document_type_id.doc_code_prefix == prefix
+            )[:1]
+            if journal_doc and journal_doc.l10n_latam_document_type_id:
+                fiscal_type_name = journal_doc.l10n_latam_document_type_id.display_name or ''
+
+        if not fiscal_type_name and 'fiscal_type_id' in order._fields and order.fiscal_type_id:
+            fiscal_type_name = order.fiscal_type_id.name or ''
 
         sequence_number = re.sub(r'^[A-Z]+', '', ncf or '')
         return {
