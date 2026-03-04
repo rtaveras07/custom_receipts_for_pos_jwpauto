@@ -55,6 +55,17 @@
                     </t>
                 </t>
             </div>
+            <t t-if="props.data.ncf || props.l10n_do_fiscal_number">
+                <div class="pos-receipt-customer" style="font-size:14px; margin-top:8px; border-top:1px dashed black; padding-top:6px;">
+                    <div>
+                        <strong>NCF:</strong>
+                        <t t-esc="props.data.ncf || props.l10n_do_fiscal_number"/>
+                    </div>
+                    <t t-if="props.data.ncf_sequence_number || props.l10n_do_ncf_sequence_number">
+                         
+                    </t>
+                </div>
+            </t>
             <t t-if="props.receipt.headerData.header">
                 <div style='text-align:center; font-size:13px'>
                     <t t-esc="props.receipt.headerData.header" />
