@@ -1,52 +1,8 @@
-from odoo import api, fields, models, _
-from odoo.exceptions import UserError
+from odoo import api, models
 import re
 
 class PosOrder(models.Model):
     _inherit = 'pos.order'
-
-    l10n_do_fiscal_number = fields.Char('Comprobante Fiscal', copy=False, readonly=True)
-    l10n_latam_document_type_id = fields.Many2one('l10n_latam.document.type', string='Tipo de Comprobante', readonly=True)
-
-    def _assign_fiscal_comprobante(self):
-        """
-        Asigna el tipo de comprobante fiscal y la secuencia correspondiente
-        según el cliente del pedido POS.
-        """
-        for order in self:
-            partner = order.partner_id
-            if not partner:
-                continue
-            fiscal_type = partner.l10n_do_dgii_tax_payer_type
-            if not fiscal_type:
-                continue
-            document_type = self.env['l10n_latam.document.type'].search([
-                ('country_id.code', '=', 'DO'),
-                ('l10n_do_ncf_type', '=', fiscal_type),
-            ], limit=1)
-            if not document_type:
-                continue
-            order.l10n_latam_document_type_id = document_type.id
-            # Generar secuencia fiscal usando lógica similar a account.move
-            move = self.env['account.move'].new({
-                'partner_id': partner.id,
-                'l10n_latam_document_type_id': document_type.id,
-                'move_type': 'out_receipt',
-                'company_id': order.company_id.id,
-            })
-            move.with_context(is_l10n_do_seq=True)._set_next_sequence()
-            order.l10n_do_fiscal_number = move.l10n_do_fiscal_number
-
-    @api.model
-    def create(self, vals):
-        order = super().create(vals)
-        order._assign_fiscal_comprobante()
-        return order
-
-    def write(self, vals):
-        res = super().write(vals)
-        self._assign_fiscal_comprobante()
-        return res
 
     @api.model
     def l10n_do_get_ticket_fiscal_data(self, order_id=False, order_ref=False):
