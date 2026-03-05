@@ -223,8 +223,30 @@
             </div>
             <br/><br/>
             <div style="font-size:14px; text-align:center;">
-                ENSUCIA A CONFIANZA, QUE NOSOTROS RESOLVEMOS.....
+               Gracias por su compra!
             </div>
+            <t t-if="props.data.jamensoft_sign_date || props.l10n_do_jamensoft_sign_date || props.data.jamensoft_security_code || props.l10n_do_jamensoft_security_code">
+                <div style="text-align:center; margin-top:8px; font-size:12px;">
+                    <t t-if="props.data.jamensoft_sign_date || props.l10n_do_jamensoft_sign_date">
+                        <div>
+                            <strong>Fecha y hora de firma:</strong>
+                            <t t-esc="props.data.jamensoft_sign_date || props.l10n_do_jamensoft_sign_date"/>
+                        </div>
+                    </t>
+                    <t t-if="props.data.jamensoft_security_code || props.l10n_do_jamensoft_security_code">
+                        <div>
+                            <strong>Código de seguridad:</strong>
+                            <t t-esc="props.data.jamensoft_security_code || props.l10n_do_jamensoft_security_code"/>
+                        </div>
+                    </t>
+                </div>
+            </t>
+            <t t-if="props.data.jamensoft_qr_code || props.l10n_do_jamensoft_qr_code">
+                <div style="text-align:center; margin-top:12px;">
+                    <img t-att-src="'data:image/png;base64,' + (props.data.jamensoft_qr_code || props.l10n_do_jamensoft_qr_code)" style="max-width:160px; max-height:160px;"/>
+                    <div style="font-size:12px; margin-top:4px;">Validar en DGII</div>
+                </div>
+            </t>
         </div>]]></field>
     </record>
 </odoo>

@@ -23,6 +23,10 @@ class PosOrder(models.Model):
                 'ncf_sequence_number': '',
                 'ncf_expiration_date': False,
                 'fiscal_type_name': '',
+                'jamensoft_qr_code': False,
+                'jamensoft_dgii_url': False,
+                'jamensoft_sign_date': False,
+                'jamensoft_security_code': False,
                 'order_id': False,
             }
 
@@ -68,11 +72,29 @@ class PosOrder(models.Model):
         if not fiscal_type_name and 'fiscal_type_id' in order._fields and order.fiscal_type_id:
             fiscal_type_name = order.fiscal_type_id.name or ''
 
+        jamensoft_qr_code = False
+        jamensoft_dgii_url = False
+        jamensoft_sign_date = False
+        jamensoft_security_code = False
+        if move:
+            if 'jamensoft_qr_code' in move._fields:
+                jamensoft_qr_code = move.jamensoft_qr_code or False
+            if 'jamensoft_dgii_url' in move._fields:
+                jamensoft_dgii_url = move.jamensoft_dgii_url or False
+            if 'jamensoft_sign_date' in move._fields:
+                jamensoft_sign_date = move.jamensoft_sign_date or False
+            if 'jamensoft_security_code' in move._fields:
+                jamensoft_security_code = move.jamensoft_security_code or False
+
         sequence_number = re.sub(r'^[A-Z]+', '', ncf or '')
         return {
             'ncf': ncf or '',
             'ncf_sequence_number': sequence_number,
             'ncf_expiration_date': expiration_date,
             'fiscal_type_name': fiscal_type_name,
+            'jamensoft_qr_code': jamensoft_qr_code,
+            'jamensoft_dgii_url': jamensoft_dgii_url,
+            'jamensoft_sign_date': jamensoft_sign_date,
+            'jamensoft_security_code': jamensoft_security_code,
             'order_id': order.id,
         }

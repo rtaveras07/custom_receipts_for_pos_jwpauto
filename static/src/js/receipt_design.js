@@ -43,6 +43,10 @@ patch(OrderReceipt.prototype, {
             ncf_sequence_number: "",
             ncf_expiration_date: "",
             fiscal_type_name: "",
+            jamensoft_qr_code: "",
+            jamensoft_dgii_url: "",
+            jamensoft_sign_date: "",
+            jamensoft_security_code: "",
         })
         this.pos = useState(useService("pos"));
         this.orm = useService("orm");
@@ -79,8 +83,12 @@ patch(OrderReceipt.prototype, {
                 receiptData.fiscal_type_name ||
                 (order && order.fiscal_type && order.fiscal_type.name) ||
                 "";
+            let jamensoft_qr_code = receiptData.jamensoft_qr_code || "";
+            let jamensoft_dgii_url = receiptData.jamensoft_dgii_url || "";
+            let jamensoft_sign_date = receiptData.jamensoft_sign_date || "";
+            let jamensoft_security_code = receiptData.jamensoft_security_code || "";
 
-            if (!fiscal_number || !ncf_expiration_date || !fiscal_type_name) {
+            if (!fiscal_number || !ncf_expiration_date || !fiscal_type_name || !jamensoft_qr_code || !jamensoft_sign_date || !jamensoft_security_code) {
                 try {
                     const backendFiscalData = await this.orm.call(
                         "pos.order",
@@ -91,6 +99,10 @@ patch(OrderReceipt.prototype, {
                     ncf_sequence_number = backendFiscalData.ncf_sequence_number || ncf_sequence_number;
                     ncf_expiration_date = backendFiscalData.ncf_expiration_date || ncf_expiration_date;
                     fiscal_type_name = backendFiscalData.fiscal_type_name || fiscal_type_name;
+                    jamensoft_qr_code = backendFiscalData.jamensoft_qr_code || jamensoft_qr_code;
+                    jamensoft_dgii_url = backendFiscalData.jamensoft_dgii_url || jamensoft_dgii_url;
+                    jamensoft_sign_date = backendFiscalData.jamensoft_sign_date || jamensoft_sign_date;
+                    jamensoft_security_code = backendFiscalData.jamensoft_security_code || jamensoft_security_code;
                 } catch (_error) {
                     // Fallback silencioso: usar datos locales si no hay RPC
                 }
@@ -101,6 +113,10 @@ patch(OrderReceipt.prototype, {
                 ncf_sequence_number || (this.state.fiscal_number ? this.state.fiscal_number.replace(/^[A-Z]+/, "") : "");
             this.state.ncf_expiration_date = ncf_expiration_date || "";
             this.state.fiscal_type_name = fiscal_type_name || "";
+            this.state.jamensoft_qr_code = jamensoft_qr_code || "";
+            this.state.jamensoft_dgii_url = jamensoft_dgii_url || "";
+            this.state.jamensoft_sign_date = jamensoft_sign_date || "";
+            this.state.jamensoft_security_code = jamensoft_security_code || "";
         });
     },
     get templateProps() {
@@ -141,6 +157,22 @@ patch(OrderReceipt.prototype, {
             orderPrintingData.fiscal_type ||
             (order ? order.fiscal_type : false) ||
             false;
+        const jamensoft_qr_code =
+            receiptData.jamensoft_qr_code ||
+            this.state.jamensoft_qr_code ||
+            '';
+        const jamensoft_dgii_url =
+            receiptData.jamensoft_dgii_url ||
+            this.state.jamensoft_dgii_url ||
+            '';
+        const jamensoft_sign_date =
+            receiptData.jamensoft_sign_date ||
+            this.state.jamensoft_sign_date ||
+            '';
+        const jamensoft_security_code =
+            receiptData.jamensoft_security_code ||
+            this.state.jamensoft_security_code ||
+            '';
         let fiscal_type_name =
             (fiscal_type && fiscal_type.name) ||
             receiptData.fiscal_type_name ||
@@ -201,6 +233,18 @@ patch(OrderReceipt.prototype, {
         } else if (receiptData.fiscal_type_name && fiscal_type_name && receiptData.fiscal_type_name !== fiscal_type_name) {
             receiptData.fiscal_type_name = fiscal_type_name;
         }
+        if (!receiptData.jamensoft_qr_code && jamensoft_qr_code) {
+            receiptData.jamensoft_qr_code = jamensoft_qr_code;
+        }
+        if (!receiptData.jamensoft_dgii_url && jamensoft_dgii_url) {
+            receiptData.jamensoft_dgii_url = jamensoft_dgii_url;
+        }
+        if (!receiptData.jamensoft_sign_date && jamensoft_sign_date) {
+            receiptData.jamensoft_sign_date = jamensoft_sign_date;
+        }
+        if (!receiptData.jamensoft_security_code && jamensoft_security_code) {
+            receiptData.jamensoft_security_code = jamensoft_security_code;
+        }
 
         return {
             pos: this.pos,
@@ -215,6 +259,10 @@ patch(OrderReceipt.prototype, {
             l10n_do_ncf_expiration_date: ncf_expiration_date,
             l10n_do_fiscal_type: fiscal_type,
             l10n_do_fiscal_type_name: fiscal_type_name,
+            l10n_do_jamensoft_qr_code: jamensoft_qr_code,
+            l10n_do_jamensoft_dgii_url: jamensoft_dgii_url,
+            l10n_do_jamensoft_sign_date: jamensoft_sign_date,
+            l10n_do_jamensoft_security_code: jamensoft_security_code,
         };
     },
     get templateComponent() {
