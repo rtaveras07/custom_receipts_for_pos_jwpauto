@@ -5,11 +5,42 @@
         <field name="name">Design 2</field>
         <field name="design_receipt"><![CDATA[
         <div class="pos-receipt">
+            <t t-set="company" t-value="props.data.headerData.company || props.pos.env.services.pos.company"/>
+            <t t-set="company_street" t-value="company and (company.street || company.street2 || company.contact_address || '')"/>
+            <t t-set="company_state" t-value="company and (company.state_name || (company.state_id and company.state_id[1]) || '')"/>
+            <t t-set="company_country" t-value="company and (company.country_name || (company.country_id and company.country_id[1]) || '')"/>
             <div style="font-size:13px; text-align:center;">
-                <t t-if="props.data.headerData.company.name">
-                    <div><t t-esc="props.data.headerData.company.name" /></div>
+                <t t-if="company and company.name">
+                    <div><t t-esc="company.name" /></div>
                 </t>
-                Phone:<t t-esc="props.pos.env.services.pos.company.phone || ''"/><br />
+                <t t-if="company_street">
+                    <div style="white-space: pre-line;"><t t-esc="company_street"/></div>
+                </t>
+                <t t-if="company and (company.city || company_state || company_country)">
+                    <div>
+                        <t t-if="company.city"><t t-esc="company.city"/></t>
+                        <t t-if="company.city and (company_state || company_country)">, </t>
+                        <t t-if="company_state"><t t-esc="company_state"/></t>
+                        <t t-if="company_state and company_country">, </t>
+                        <t t-if="company_country"><t t-esc="company_country"/></t>
+                    </div>
+                </t>
+                <t t-if="company and (company.phone or company.mobile)">
+                    <div>
+                        <t t-if="company.phone">Tel.: <t t-esc="company.phone"/></t>
+                        <t t-if="company.phone and company.mobile"> / </t>
+                        <t t-if="company.mobile">Cel.: <t t-esc="company.mobile"/></t>
+                    </div>
+                </t>
+                <t t-if="company and company.email">
+                    <div>Email: <t t-esc="company.email"/></div>
+                </t>
+                <t t-if="company and company.vat">
+                    <div>RNC: <t t-esc="company.vat"/></div>
+                </t>
+                <t t-if="company and company.email">
+                    <div><t t-esc="company.email"/></div>
+                </t>
             </div>
             <br/>
             <div style="font-size:13px; text-align:center;">
@@ -172,9 +203,11 @@
                 </t>
             </div>
             <br/><br/>
-            <div style="font-size:14px; text-align:center;">
-                Thank You... Please Visit Again ...
-            </div>
+            <t t-if="company and company.slogan">
+                <div style="font-size:14px; text-align:center;">
+                    <t t-esc="company.slogan"/>
+                </div>
+            </t>
         </div>]]></field>
     </record>
 </odoo>

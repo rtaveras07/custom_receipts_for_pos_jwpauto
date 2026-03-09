@@ -7,22 +7,52 @@
         <div class="pos-receipt">
           
 
+            <t t-set="company" t-value="props.data.headerData.company || props.pos.env.services.pos.company"/>
+            <t t-set="company_street" t-value="company and (company.street || company.street2 || company.contact_address || '')"/>
+            <t t-set="company_state" t-value="company and (company.state_name || (company.state_id and company.state_id[1]) || '')"/>
+            <t t-set="company_country" t-value="company and (company.country_name || (company.country_id and company.country_id[1]) || '')"/>
             <div class="pos-receipt-contact">
-                <t t-if="props.data.headerData.company.name">
-                    <div><strong style="font-size:18px;"><t t-esc="props.data.headerData.company.name" /></strong></div>
+                <t t-if="company and company.name">
+                    <div><strong style="font-size:18px;"><t t-esc="company.name" /></strong></div>
                 </t>
-               
             </div>
             <br/>
-            <div style="text-align: center; font-size: 12px;">
-                ING. GUZMÁN ABREU ESQ. BONÓ #8
-            </div>
-            <div style="text-align: center; font-size: 12px;">
-                San Francisco de Macorís, Duarte.
-            </div>
-            <div style="text-align: center; font-size: 12px;">
-                Cel.: 849-281-5893
-            </div>
+            <t t-if="company_street">
+                <div style="text-align: center; font-size: 12px; white-space: pre-line;">
+                    <t t-esc="company_street"/>
+                </div>
+            </t>
+            <t t-if="company and (company.city || company_state || company_country)">
+                <div style="text-align: center; font-size: 12px;">
+                    <t t-if="company.city"><t t-esc="company.city"/></t>
+                    <t t-if="company.city and (company_state || company_country)">, </t>
+                    <t t-if="company_state"><t t-esc="company_state"/></t>
+                    <t t-if="company_state and company_country">, </t>
+                    <t t-if="company_country"><t t-esc="company_country"/></t>
+                </div>
+            </t>
+            <t t-if="company and (company.phone or company.mobile)">
+                <div style="text-align: center; font-size: 12px;">
+                    <t t-if="company.phone">Tel.: <t t-esc="company.phone"/></t>
+                    <t t-if="company.phone and company.mobile"> / </t>
+                    <t t-if="company.mobile">Cel.: <t t-esc="company.mobile"/></t>
+                </div>
+            </t>
+            <t t-if="company and company.email">
+                <div style="text-align: center; font-size: 12px;">
+                    Email: <t t-esc="company.email"/>
+                </div>
+            </t>
+            <t t-if="company and company.vat">
+                <div style="text-align: center; font-size: 12px;">
+                    RNC: <t t-esc="company.vat"/>
+                </div>
+            </t>
+            <t t-if="company and company.email">
+                <div style="text-align: center; font-size: 12px;">
+                    <t t-esc="company.email"/>
+                </div>
+            </t>
             <div style="text-align: center; font-size: 12px;">
              <t t-if="props.receipt.headerData.cashier">
                     <div class="cashier">
@@ -180,9 +210,11 @@
                 </t>
             </div>
             <br/><br/>
-            <div style="font-size:14px; text-align:center;">
-                ENSUCIA A CONFIANZA, QUE NOSOTROS RESOLVEMOS.....
-            </div>
+            <t t-if="company and company.slogan">
+                <div style="font-size:14px; text-align:center;">
+                    <t t-esc="company.slogan"/>
+                </div>
+            </t>
         </div>]]></field>
     </record>
 </odoo>

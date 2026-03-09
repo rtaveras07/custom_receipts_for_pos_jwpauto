@@ -15,8 +15,7 @@ patch(OrderReceipt.prototype, {
     get templateProps() {
         const order = this.pos.get_order();
         const partner = order ? order.get_partner() : null;
-        
-        // Datos básicos del partner (incluso si es null)
+        // Datos básicos del partner
         const partnerData = partner ? {
             name: partner.name,
             vat: partner.vat,
@@ -24,9 +23,27 @@ patch(OrderReceipt.prototype, {
             city: partner.city,
             phone: partner.phone,
             email: partner.email,
-            // ...otros campos necesarios
-        } : { name: "" };  // Partner por defecto
-    
+        } : { name: "" };
+
+        // Datos de la compañía
+        const company = this.pos.company || {};
+        const companyData = {
+            name: company.name,
+            street: company.street,
+            street2: company.street2,
+            contact_address: company.contact_address,
+            city: company.city,
+            state_name: company.state_name,
+            country_name: company.country_name,
+            phone: company.phone,
+            mobile: company.mobile,
+            vat: company.vat,
+            email: company.email,
+            slogan: company.slogan,
+            state_id: company.state_id,
+            country_id: company.country_id,
+        };
+
         return {
             pos: this.pos,
             data: this.props.data,
@@ -34,7 +51,8 @@ patch(OrderReceipt.prototype, {
             receipt: this.props.data,
             orderlines: this.props.data.orderlines,
             paymentlines: this.props.data.paymentlines,
-            partner: partnerData,  // Envía el objeto procesado
+            partner: partnerData,
+            company: companyData,
         };
     },
     get templateComponent() {
