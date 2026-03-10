@@ -1,36 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Examples for receipt design: which can be used or modified -->
-    <record id="pos_receipt_design2_demo" model="pos.receipt">
-        <field name="name">Design 2</field>
+    <record id="pos_receipt_design1" model="pos.receipt">
+        <field name="name">Design 1</field>
         <field name="design_receipt"><![CDATA[
         <div class="pos-receipt">
-            <div style="font-size:13px; text-align:center;">
+          
+
+            <div class="pos-receipt-contact">
                 <t t-if="props.data.headerData.company.name">
-                    <div><t t-esc="props.data.headerData.company.name" /></div>
+                    <div><strong style="font-size:18px;"><t t-esc="props.data.headerData.company.name" /></strong></div>
                 </t>
-                Phone:<t t-esc="props.pos.env.services.pos.company.phone || ''"/><br />
+                <t t-if="(props.data.headerData.company and props.data.headerData.company.vat) || (props.pos and props.pos.company and props.pos.company.vat)">
+                    <div style="font-size:12px;">
+                        <strong>RNC:</strong>
+                        <t t-esc="(props.data.headerData.company and props.data.headerData.company.vat) || (props.pos and props.pos.company and props.pos.company.vat)"/>
+                    </div>
+                </t>
+               
             </div>
             <br/>
-            <div style="font-size:13px; text-align:center;">
-                Date :
-                <t t-if="props.receipt.date">
-                    <t t-esc="props.receipt.date"/>
-                </t>
-                <t t-else="">
-                    <t t-esc="props.order.validation_date"/>
-                </t>
-                <br />
+            <t t-set="company_info" t-value="(props.data.headerData and props.data.headerData.company) || (props.pos and props.pos.company) || {}"/>
+            <div style="text-align: center; font-size: 12px;" t-if="company_info.street || company_info.street2">
+                <t t-esc="company_info.street || ''"/>
+                <t t-if="company_info.street and company_info.street2">, </t>
+                <t t-esc="company_info.street2 || ''"/>
             </div>
-            <br />
-            <div style="font-size:13px; text-align:center;">
-                Cashier :  <t t-esc='props.receipt.headerData.cashier' /><br />
-                <br />
-                <div class="fw-bolder" t-if="props.data.headerData.trackingNumber">
-                    <span class="fs-2" t-esc="props.data.headerData.trackingNumber" />
+            <div style="text-align: center; font-size: 12px;" t-if="company_info.city || company_info.state_name || company_info.country_name">
+                <t t-esc="company_info.city || ''"/>
+                <t t-if="company_info.city and (company_info.state_name || company_info.country_name)">, </t>
+                <t t-esc="company_info.state_name || ''"/>
+                <t t-if="company_info.state_name and company_info.country_name">, </t>
+                <t t-esc="company_info.country_name || ''"/>
+            </div>
+            <div style="text-align: center; font-size: 12px;" t-if="company_info.phone || company_info.mobile">
+                Tel.: <t t-esc="company_info.phone || company_info.mobile"/>
+            </div>
+            <div style="text-align: center; font-size: 12px;">
+             <t t-if="props.receipt.headerData.cashier">
+                    <div class="cashier">
+                        <div>--------------------------------</div>
+                        <div>Atendido por <t t-esc="props.receipt.headerData.cashier" /></div>
+                    </div>
+                    <div class="fw-bolder" t-if="props.data.headerData.trackingNumber">
+                        <span class="fs-2" t-esc="props.data.headerData.trackingNumber" />
+                    </div>
+                </t>
+            </div>
+            <!-- Información del Cliente -->
+            <div class="pos-receipt-customer" style="font-size:14px; margin-top:10px;">
+                <t t-if="props.partner and props.partner.name != ''">
+                    <div><strong>Cliente:</strong> <t t-esc="props.partner.name"/></div>
+                    <t t-if="props.partner.vat">
+                        <div><strong>RNC/Cédula:</strong> <t t-esc="props.partner.vat"/></div>
+                    </t>
+                    <t t-if="props.partner.street">
+                        <div><strong>Dirección:</strong> <t t-esc="props.partner.street"/></div>
+                    </t>
+                    <t t-if="props.partner.city">
+                        <div><strong>Ciudad:</strong> <t t-esc="props.partner.city"/></div>
+                    </t>
+                    <t t-if="props.partner.phone">
+                        <div><strong>Teléfono:</strong> <t t-esc="props.partner.phone"/></div>
+                    </t>
+                    <t t-if="props.partner.email">
+                        <div><strong>Email:</strong> <t t-esc="props.partner.email"/></div>
+                    </t>
+                </t>
+            </div>
+            <t t-if="props.data.ncf || props.l10n_do_fiscal_number">
+                <div class="pos-receipt-customer" style="font-size:14px; margin-top:8px; border-top:1px dashed black; padding-top:6px;">
+                    <t t-if="props.data.fiscal_type_name || props.l10n_do_fiscal_type_name || (props.data.fiscal_type and props.data.fiscal_type.name)">
+                        <div>
+                            <strong>Tipo de factura:</strong>
+                            <t t-esc="props.data.fiscal_type_name || props.l10n_do_fiscal_type_name || (props.data.fiscal_type and props.data.fiscal_type.name)"/>
+                        </div>
+                    </t>
+                    <div>
+                        <strong>NCF:</strong>
+                        <t t-esc="props.data.ncf || props.l10n_do_fiscal_number"/>
+                        <t t-if="props.data.ncf_expiration_date || props.l10n_do_ncf_expiration_date">
+                            <span> | Vence: </span>
+                            <t t-esc="props.data.ncf_expiration_date || props.l10n_do_ncf_expiration_date"/>
+                        </t>
+                    </div>
+                    <t t-if="props.data.ncf_sequence_number || props.l10n_do_ncf_sequence_number">
+                         
+                    </t>
                 </div>
-            </div>
-            <br/>
+            </t>
             <t t-if="props.receipt.headerData.header">
                 <div style='text-align:center; font-size:13px'>
                     <t t-esc="props.receipt.headerData.header" />
@@ -38,92 +96,82 @@
                 <br />
             </t>
             <div>
-                <table class='receipt-orderlines' style="font-size:15px; border-style:double;
-            border-left:none; border-right:none; border-bottom:none; width:100%;">
-                <colgroup>
-                    <col width='26%' />
-                    <col width='10%' />
-                    <col width='14%' />
-                    <col width='25%' />
-                    <col width='25%' />
-                </colgroup>
-                <tr style="border-bottom:1px dashed black;">
-                    <th style="text-align:left;">Product</th>
-                    <th style="text-align:right;">Qty</th>
-                    <th style="text-align:right;">U/M</th>
-                    <th style="text-align:right;">Price</th>
-                    <th style="text-align:right;">Amount</th>
-                </tr>
-                <t t-if="props.order and props.order.length and props.order[0] and props.order[0].pos and props.order[0].pos.mainScreen and props.order[0].pos.mainScreen.props and props.order[0].pos.mainScreen.props.order and props.order[0].pos.mainScreen.props.order.orderlines and props.order[0].pos.mainScreen.props.order.orderlines.length">
-                        <t t-if="props.order[0].pos.mainScreen.props">
-                            <tr t-foreach="props.order[0].pos.mainScreen.props.order.orderlines" t-as="orderline" t-key="orderline_index">
-                                <td style="padding-top:1%; padding-bottom:1%; text-align:left;">
-                                    <t t-esc="orderline.productName"/>
-                                    <t t-if="orderline.discount > 0">
-                                        <div style="font-size:12px; font-style:italic; color:#808080;">
-                                            <t t-esc="orderline.discount"/>% discount
-                                        </div>
-                                    </t>
-                                    <t t-if="orderline.customerNote">
-                                        <div style="font-size:14px;" t-esc="orderline.customerNote"/>
-                                    </t>
-                                </td>
-                                <td style="text-align:right; font-size:14px;">
-                                    <t t-esc="orderline.qty"/>
-                                </td>
-                                <td style="text-align:right; font-size:14px;">
-                                    <t t-esc="orderline.unit_name || orderline.unitName || orderline.unit || '-'"/>
-                                </td>
-                                <td style="text-align:right; font-size:14px;">
-                                    <t t-esc="orderline.unitPrice"/>
-                                </td>
-                                <td style="text-align:right; font-size:14px;">
-                                    <t t-esc="orderline.price || orderline.priceDisplay || orderline.unitPrice"/>
-                                </td>
-                            </tr>
-                        </t>
-                    </t>
-                    <t t-else="">
-                        <t t-if="props.orderlines and props.orderlines.length">
-                            <tr t-foreach="props.orderlines" t-as="orderline" t-key="orderline_index">
-                                <td style="padding-top:1%; padding-bottom:1%; text-align:left;">
-                                    <t t-esc="orderline.productName"/>
-                                    <t t-if="orderline.discount > 0">
-                                        <div style="font-size:12px; font-style:italic; color:#808080;">
-                                            <t t-esc="orderline.discount"/>% discount
-                                        </div>
-                                    </t>
-                                    <t t-if="orderline.customerNote">
-                                        <div style="font-size:14px;" t-esc="orderline.customerNote"/>
-                                    </t>
-                                </td>
-                                <td style="text-align:right; font-size:14px;">
-                                    <t t-esc="orderline.qty"/>
-                                </td>
-                                <td style="text-align:right; font-size:14px;">
-                                    <t t-esc="orderline.unit_name || orderline.unitName || orderline.unit || '-'"/>
-                                </td>
-                                <td style="text-align:right; font-size:14px;">
-                                    <t t-esc="orderline.unitPrice"/>
-                                </td>
-                                <td style="text-align:right; font-size:14px;">
-                                    <t t-esc="orderline.price || orderline.priceDisplay || orderline.unitPrice"/>
-                                </td>
-                            </tr>
-                        </t>
+                <table style="width:100%; font-size:13px;">
+                    <tr>
+                        <td style="text-align:center;">Cantidad</td>
+                        <td style="text-align:center;">Descripción</td>
+                        <td style="text-align:center;">Unidad de Medida</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;">Precio</td>
+                        <td style="text-align:center;">ITBIS</td>
+                        <td style="text-align:center;">Valor</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><hr style="border-top:1px dashed;"/></td>
+                    </tr>
+                    <t t-foreach="props.orderlines" t-as="orderline" t-key="orderline_index">
+                        <tr>
+                            <td style="text-align:center;">
+                                <t t-esc="orderline.qty"/>
+                            </td>
+                            <td style="text-align:center;">
+                                <t t-esc="orderline.productName"/>
+                            </td>
+                            <td style="text-align:center;">
+                                <t t-esc="orderline.unit_name || orderline.unitName || orderline.unit || '-'"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center;">
+                                <t t-if="orderline.unitPrice !== undefined &amp;&amp; orderline.unitPrice !== null &amp;&amp; typeof orderline.unitPrice === 'number'">
+                                    <t t-esc="props.pos.env.utils.formatCurrency(orderline.unitPrice)"/>
+                                </t>
+                                <t t-else="">-</t>
+                            </td>
+                            <td style="text-align:center;">
+                                <t t-if="orderline.tax !== undefined &amp;&amp; orderline.tax !== null &amp;&amp; typeof orderline.tax === 'number'">
+                                    <t t-esc="props.pos.env.utils.formatCurrency(orderline.tax)"/>
+                                </t>
+                                <t t-else="">-</t>
+                            </td>
+                            <td style="text-align:center;">
+                                <t t-if="(orderline.price !== undefined &amp;&amp; orderline.price !== null &amp;&amp; typeof orderline.price === 'number') || (orderline.priceDisplay !== undefined &amp;&amp; orderline.priceDisplay !== null &amp;&amp; typeof orderline.priceDisplay === 'number') || (orderline.unitPrice !== undefined &amp;&amp; orderline.unitPrice !== null &amp;&amp; typeof orderline.unitPrice === 'number')">
+                                    <t t-esc="props.pos.env.utils.formatCurrency(orderline.price || orderline.priceDisplay || orderline.unitPrice)"/>
+                                </t>
+                                <t t-else="">-</t>
+                            </td>
+                        </tr>
                     </t>
                 </table>
             </div>
             <br />
+             <t t-if="props.receipt.paymentlines and props.receipt.paymentlines.length">
+    <div style="border-top:1px dashed black; font-weight: 600; font-size:14px; margin-top:10px;">
+        <div>Método(s) de pago:</div>
+        <t t-foreach="props.receipt.paymentlines" t-as="payline" t-key="payline.cid">
+            <div style="display: flex; justify-content: space-between;">
+                <span><t t-esc="payline.name"/></span>
+                <span><t t-esc="props.pos.env.utils.formatCurrency(payline.amount)"/></span>
+            </div>
+        </t>
+    </div>
+</t>
+              
             <div style="padding-top:6px;">
                 <t t-set='taxincluded' t-value='Math.abs(props.receipt.amount_total - props.receipt.total_with_tax) &lt;= 0.000001' />
                 <t t-if='!taxincluded'>
                     <br/>
-                    <div style="font-weight:700; font-size:14px; border-top:1px dashed;"><span style="margin-left:40%;">Subtotal : </span><span t-esc='props.pos.env.utils.formatCurrency(props.data.total_without_tax)' class="pos-receipt-right-align"/></div>
+                    <div style="font-weight:700; font-size:14px; border-top:1px dashed;">
+                        <span style="margin-left:40%;">Subtotal : </span>
+                        <span t-esc='props.pos.env.utils.formatCurrency(props.data.total_without_tax)'
+                            class="pos-receipt-right-align"/>
+                    </div>
                     <t t-foreach='props.data.tax_details' t-as='tax' t-key="tax.tax.id">
                         <div style="font-weight:700; font-size:14px;">
                             <span style="margin-left:40%;"><t t-esc='tax.name' /></span>
-                            <span t-esc='props.pos.env.utils.formatCurrency(tax.amount)' class="pos-receipt-right-align"/>
+                            <span t-esc='props.pos.env.utils.formatCurrency(tax.amount)'
+                                    class="pos-receipt-right-align"/>
                         </div>
                     </t>
                 </t>
@@ -135,62 +183,44 @@
                 </div>
                 <br/><br/>
             </div>
-            <!-- Payment Lines -->
-            <t t-foreach='props.paymentlines' t-as='line' t-key="line_index">
-                <div style="font-size:14px; border-top:1px dashed; padding-top:5px;">
-                    <span style="margin-left:40%;"><t t-esc='line.name' /></span>
-                    <span t-esc='props.pos.env.utils.formatCurrency(line.amount)' class="pos-receipt-right-align"/>
-                </div>
-            </t>
-            <br/>
-            <div class="receipt-change" style="font-size:14px;">
-            <span style="margin-left:40%;">CHANGE : </span>
-                <span t-esc='props.pos.env.utils.formatCurrency(props.receipt.change)' class="pos-receipt-right-align"/>
-            </div>
-            <br/>
-            <!-- Extra Payment Info -->
-            <t t-if='props.receipt.total_discount'>
-                <div style="font-size:14px; border-top:1px dashed; padding-top:5px;">
-                    <span style="margin-left:40%;">Discounts : </span>
-                    <span t-esc='props.pos.env.utils.formatCurrency(props.receipt.total_discount)' class="pos-receipt-right-align"/>
-                </div>
-            </t>
-            <t t-if='taxincluded'>
-                <t t-foreach='props.receipt.tax_details' t-as='tax' t-key="index_receipt_tax_details">
-                    <div style="font-size:14px;">
-                        <span style="margin-left:40%;"><t t-esc='tax.name' /></span>
-                        <span t-esc='props.pos.env.utils.formatCurrency(tax.amount)' class="pos-receipt-right-align"/>
-                    </div>
-                </t>
-                <div style="font-size:14px;">
-                    <span style="margin-left:40%;">Total Taxes : </span>
-                    <span t-esc='props.pos.env.utils.formatCurrency(props.receipt.total_tax)' class="pos-receipt-right-align"/>
-                </div>
-            </t>
             <div class='before-footer' />
+            <br/><br/>
             <!-- Footer -->
-            <div t-if='props.receipt.footer_html' style="text-align:center; font-size:14px;">
-                <t t-raw='props.receipt.footer_html'/>
-            </div>
-            <div t-if='!props.receipt.footer_html and props.receipt.footer' style="text-align:center; font-size:14px;">
-                <br/>
-                <t t-esc='props.receipt.footer'/>
-                <br/><br/>
-            </div>
-            <div class='after-footer' style="font-size:14px;">
-                <t t-foreach='props.paymentlines' t-as='line' t-key="line_index">
-                    <t t-if='line.ticket'>
-                        <br />
-                        <div class="pos-payment-terminal-receipt">
-                            <t t-raw='line.ticket'/>
-                        </div>
-                    </t>
+            <div class="pos-receipt-order-data">
+                <div><t t-esc="props.receipt.name" /></div>
+                <t t-if="props.receipt.date">
+                    <div><t t-esc="props.receipt.date" /></div>
+                </t>
+                <t t-else="">
+                    <div><t t-esc="props.receipt.date" /></div>
                 </t>
             </div>
             <br/><br/>
             <div style="font-size:14px; text-align:center;">
-                Thank You... Please Visit Again ...
+               Gracias por su compra!
             </div>
+            <t t-if="props.data.jamensoft_sign_date || props.l10n_do_jamensoft_sign_date || props.data.jamensoft_security_code || props.l10n_do_jamensoft_security_code">
+                <div style="text-align:center; margin-top:8px; font-size:12px;">
+                    <t t-if="props.data.jamensoft_sign_date || props.l10n_do_jamensoft_sign_date">
+                        <div>
+                            <strong>Fecha y hora de firma:</strong>
+                            <t t-esc="props.data.jamensoft_sign_date || props.l10n_do_jamensoft_sign_date"/>
+                        </div>
+                    </t>
+                    <t t-if="props.data.jamensoft_security_code || props.l10n_do_jamensoft_security_code">
+                        <div>
+                            <strong>Código de seguridad:</strong>
+                            <t t-esc="props.data.jamensoft_security_code || props.l10n_do_jamensoft_security_code"/>
+                        </div>
+                    </t>
+                </div>
+            </t>
+            <t t-if="props.data.jamensoft_qr_code || props.l10n_do_jamensoft_qr_code">
+                <div style="text-align:center; margin-top:12px;">
+                    <img t-att-src="'data:image/png;base64,' + (props.data.jamensoft_qr_code || props.l10n_do_jamensoft_qr_code)" style="max-width:160px; max-height:160px;"/>
+                    <div style="font-size:12px; margin-top:4px;">Validar en DGII</div>
+                </div>
+            </t>
         </div>]]></field>
     </record>
 </odoo>
