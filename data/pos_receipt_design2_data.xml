@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Examples for receipt design: which can be used or modified -->
-    <record id="pos_receipt_design1" model="pos.receipt">
-        <field name="name">Design 1</field>
+    <record id="pos_receipt_design2" model="pos.receipt">
+        <field name="name">Design 2</field>
         <field name="design_receipt"><![CDATA[
         <div class="pos-receipt">
           
