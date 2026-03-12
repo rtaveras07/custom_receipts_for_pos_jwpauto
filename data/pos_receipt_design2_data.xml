@@ -117,6 +117,14 @@
                             </td>
                             <td style="text-align:center;">
                                 <t t-esc="orderline.productName"/>
+                                <t t-if="orderline.discount > 0">
+                                    <div style="font-size:12px; font-style:italic; color:#808080;">
+                                        <t t-esc="orderline.discount"/>% desc.
+                                    </div>
+                                </t>
+                                <t t-if="orderline.customerNote">
+                                    <div style="font-size:12px;" t-esc="orderline.customerNote"/>
+                                </t>
                             </td>
                             <td style="text-align:center;">
                                 <t t-esc="orderline.unit_name || '-'"/>
@@ -175,10 +183,17 @@
                         </div>
                     </t>
                 </t>
+                <!-- Total Descuento -->
+                <t t-if="props.data.has_discount">
+                    <div style="font-weight:700; font-size:14px; display: flex; justify-content: flex-end; align-items: center;">
+                        <span style="margin-right:8px;">Descuento total :</span>
+                        <span t-esc="props.pos.env.utils.formatCurrency(props.data.total_discount)" style="min-width:60px; text-align:right;"/>
+                    </div>
+                </t>
                 <!-- Total -->
                 <br/>
                 <div style="font-weight:700; font-size:14px;">
-                    <span style="margin-left:40%;">TOTAL : </span>
+                    <span style="margin-left:40%">TOTAL : </span>
                     <span t-esc='props.pos.env.utils.formatCurrency(props.data.amount_total)' class="pos-receipt-right-align"/>
                 </div>
                 <br/><br/>
