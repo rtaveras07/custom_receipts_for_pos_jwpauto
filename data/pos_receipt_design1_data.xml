@@ -129,21 +129,21 @@
                                     <div style="font-size:12px;" t-esc="orderline.customerNote"/>
                                 </t>
                             </td>
-                            <td style="text-align:right; font-size:12px;">
+                            <td style="text-align:left; font-size:12px;">
                                 <t t-esc="orderline.unit_name || orderline.unitName || orderline.unit || '-'"/>
                             </td>
-                            <td style="text-align:right; font-size:12px;">
-                               <t t-esc="orderline.unitPrice.toFixed(2)"/>
+                            <td style="text-align:left; font-size:12px;">
+                               <t t-esc="props.pos.env.utils.formatCurrency(orderline.unitPrice)"/>
                             </td>
-                             <td style="text-align:right; font-size:12px;">
+                             <td style="text-align:left; font-size:12px;">
                             <t t-if="orderline.tax_amount !== undefined &amp;&amp; orderline.tax_amount !== null &amp;&amp; typeof orderline.tax_amount === 'number'">
-                                <t t-esc="orderline.tax_amount.toFixed(2)"/>
+                                <t t-esc="props.pos.env.utils.formatCurrency(orderline.tax_amount)"/>
                                 
                             </t>
                             <t t-else="">-</t>
                         </td>
-                            <td style="text-align:right; font-size:12px;">
-                                <t t-esc="orderline.price.toFixed(2)" />
+                            <td style="text-align:left; font-size:12px;">
+                                <t t-esc="props.pos.env.utils.formatCurrency(orderline.price)" />
                                 <t t-if="orderline.tax_amount === 0"> E</t>
                             </td>
                         </tr>
@@ -157,7 +157,7 @@
         <t t-foreach="props.receipt.paymentlines" t-as="payline" t-key="payline.cid">
             <div style="display: flex; justify-content: space-between;">
                 <span><t t-esc="payline.name"/></span>
-                <span><t t-esc="payline.amount.toFixed(2)"/></span>
+                <span><t t-esc="props.pos.env.utils.formatCurrency(payline.amount)"/></span>
             </div>
         </t>
     </div>
@@ -169,13 +169,13 @@
                     <br/>
                     <div style="font-weight:700; font-size:14px; border-top:1px dashed;">
                         <span style="margin-left:40%;">Subtotal : </span>
-                        <span t-esc='props.data.total_without_tax.toFixed(2)'
+                        <span t-esc='props.pos.env.utils.formatCurrency(props.data.total_without_tax)'
                             class="pos-receipt-right-align"/>
                     </div>
                     <t t-foreach='props.data.tax_details' t-as='tax' t-key="tax.tax.id">
                         <div style="font-weight:700; font-size:14px;">
                             <span style="margin-left:40%;"><t t-esc='tax.name' /></span>
-                                <span t-esc='tax.amount.toFixed(2)'
+                            <span t-esc='props.pos.env.utils.formatCurrency(tax.amount)'
                                     class="pos-receipt-right-align"/>
                         </div>
                     </t>
@@ -184,14 +184,14 @@
                 <t t-if="props.data.has_discount">
                     <div style="font-weight:700; font-size:14px;">
                         <span style="margin-left:40%;">Descuento total : </span>
-                        <span t-esc="props.data.total_discount.toFixed(2)" class="pos-receipt-right-align"/>
+                        <span t-esc="props.pos.env.utils.formatCurrency(props.data.total_discount)" class="pos-receipt-right-align"/>
                     </div>
                 </t>
                 <!-- Total -->
                 <br/>
                 <div style="font-weight:700; font-size:14px;">
                     <span style="margin-left:40%;">TOTAL : </span>
-                    <span t-esc='props.data.amount_total.toFixed(2)' class="pos-receipt-right-align"/>
+                    <span t-esc='props.pos.env.utils.formatCurrency(props.data.amount_total)' class="pos-receipt-right-align"/>
                 </div>
                 <br/><br/>
             </div>
