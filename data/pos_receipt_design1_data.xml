@@ -138,11 +138,13 @@
                              <td style="text-align:left; font-size:12px;">
                             <t t-if="orderline.tax_amount !== undefined &amp;&amp; orderline.tax_amount !== null &amp;&amp; typeof orderline.tax_amount === 'number'">
                                 <t t-esc="props.pos.env.utils.formatCurrency(orderline.tax_amount)"/>
+                                <t t-if="orderline.tax_amount === 0"> E</t>
                             </t>
                             <t t-else="">-</t>
                         </td>
                             <td style="text-align:left; font-size:12px;">
                                 <t t-esc="orderline.price" />
+                                <t t-if="orderline.tax_amount === 0"> E</t>
                             </td>
                         </tr>
                     </t>
