@@ -129,20 +129,20 @@
                                     <div style="font-size:12px;" t-esc="orderline.customerNote"/>
                                 </t>
                             </td>
-                            <td style="text-align:left; font-size:12px;">
+                            <td style="text-align:right; font-size:12px;">
                                 <t t-esc="orderline.unit_name || orderline.unitName || orderline.unit || '-'"/>
                             </td>
-                            <td style="text-align:left; font-size:12px;">
+                            <td style="text-align:right; font-size:12px;">
                                <t t-esc="orderline.unitPrice.toFixed(2)"/>
                             </td>
-                             <td style="text-align:left; font-size:12px;">
+                             <td style="text-align:right; font-size:12px;">
                             <t t-if="orderline.tax_amount !== undefined &amp;&amp; orderline.tax_amount !== null &amp;&amp; typeof orderline.tax_amount === 'number'">
                                 <t t-esc="orderline.tax_amount.toFixed(2)"/>
                                 
                             </t>
                             <t t-else="">-</t>
                         </td>
-                            <td style="text-align:left; font-size:12px;">
+                            <td style="text-align:right; font-size:12px;">
                                 <t t-esc="orderline.price.toFixed(2)" />
                                 <t t-if="orderline.tax_amount === 0"> E</t>
                             </td>
