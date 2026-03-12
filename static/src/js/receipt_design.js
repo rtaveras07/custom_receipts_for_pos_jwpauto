@@ -246,21 +246,42 @@ patch(OrderReceipt.prototype, {
             receiptData.jamensoft_security_code = jamensoft_security_code;
         }
 
+        // Mapeo seguro de orderlines
+        const mappedOrderlines = (order && order.orderlines) ? order.orderlines.map(line => {
+            return {
+                productName: line.product.name,
+                qty: line.quantity,
+                unitPrice: line.price,
+                unit_name: line.product.uom_id && line.product.uom_id[1] ? line.product.uom_id[1] : '-',
+                price: line.get_price_with_tax ? line.get_price_with_tax() : line.price,
+                tax_amount: (line.get_price_with_tax && line.get_price_without_tax) ? (line.get_price_with_tax() - line.get_price_without_tax()) : 0,
+                discount: line.discount || 0,
+                customerNote: line.customerNote || '',
+            };
+        }) : (Array.isArray(receiptData.orderlines) ? receiptData.orderlines.map(line => ({
+            productName: line.productName || '',
+            qty: line.qty || 0,
+            unitPrice: line.unitPrice || 0.0,
+            unit_name: line.unit_name || '-',
+            price: line.price || 0.0,
+            tax_amount: line.tax_amount || 0.0,
+            discount: line.discount || 0.0,
+            customerNote: line.customerNote || '',
+        })) : []);
+
+        // Calcular total_discount y has_discount
+        const total_discount = mappedOrderlines.reduce((acc, l) => acc + ((l.unitPrice * l.qty * l.discount) / 100), 0);
+        const has_discount = mappedOrderlines.some(l => l.discount && l.discount > 0);
+
         return {
             pos: this.pos,
-            data: receiptData,
+            data: Object.assign({}, receiptData, {
+                total_discount,
+                has_discount
+            }),
             order: order,
             receipt: receiptData,
-            orderlines: (order && order.orderlines) ? order.orderlines.map(line => {
-                return {
-                    productName: line.product.name,
-                    qty: line.quantity,
-                    unitPrice: line.price,
-                    unit_name: line.product.uom_id && line.product.uom_id[1] ? line.product.uom_id[1] : '-',
-                    price: line.get_price_with_tax ? line.get_price_with_tax() : line.price,
-                    tax_amount: (line.get_price_with_tax && line.get_price_without_tax) ? (line.get_price_with_tax() - line.get_price_without_tax()) : 0,
-                };
-            }) : receiptData.orderlines,
+            orderlines: mappedOrderlines,
             paymentlines: receiptData.paymentlines,
             partner: partnerData,
             l10n_do_fiscal_number: fiscal_number,

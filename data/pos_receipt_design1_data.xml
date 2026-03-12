@@ -178,6 +178,13 @@
                         </div>
                     </t>
                 </t>
+                <!-- Total Descuento -->
+                <t t-if="props.data.has_discount">
+                    <div style="font-weight:700; font-size:14px;">
+                        <span style="margin-left:40%;">Descuento total : </span>
+                        <span t-esc="props.pos.env.utils.formatCurrency(props.data.total_discount)" class="pos-receipt-right-align"/>
+                    </div>
+                </t>
                 <!-- Total -->
                 <br/>
                 <div style="font-weight:700; font-size:14px;">
