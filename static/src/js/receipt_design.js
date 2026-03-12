@@ -251,7 +251,16 @@ patch(OrderReceipt.prototype, {
             data: receiptData,
             order: order,
             receipt: receiptData,
-            orderlines: receiptData.orderlines,
+            orderlines: (order && order.orderlines) ? order.orderlines.map(line => {
+                return {
+                    productName: line.product.name,
+                    qty: line.quantity,
+                    unitPrice: line.price,
+                    price: line.get_price_with_tax ? line.get_price_with_tax() : line.price,
+                    tax_amount: (line.get_price_with_tax && line.get_price_without_tax) ? (line.get_price_with_tax() - line.get_price_without_tax()) : 0,
+                    // ...otros campos si necesitas
+                };
+            }) : receiptData.orderlines,
             paymentlines: receiptData.paymentlines,
             partner: partnerData,
             l10n_do_fiscal_number: fiscal_number,
