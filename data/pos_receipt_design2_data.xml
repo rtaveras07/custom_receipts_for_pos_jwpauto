@@ -119,7 +119,7 @@
                                 <t t-esc="orderline.productName"/>
                             </td>
                             <td style="text-align:center;">
-                                <t t-esc="orderline.unit_name || orderline.unitName || orderline.unit || '-'"/>
+                                <t t-esc="orderline.unit_name || '-'"/>
                             </td>
                         </tr>
                         <tr>

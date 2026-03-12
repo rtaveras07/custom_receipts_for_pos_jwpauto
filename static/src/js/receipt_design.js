@@ -256,9 +256,9 @@ patch(OrderReceipt.prototype, {
                     productName: line.product.name,
                     qty: line.quantity,
                     unitPrice: line.price,
+                    unit_name: line.product.uom_id && line.product.uom_id[1] ? line.product.uom_id[1] : '-',
                     price: line.get_price_with_tax ? line.get_price_with_tax() : line.price,
                     tax_amount: (line.get_price_with_tax && line.get_price_without_tax) ? (line.get_price_with_tax() - line.get_price_without_tax()) : 0,
-                    // ...otros campos si necesitas
                 };
             }) : receiptData.orderlines,
             paymentlines: receiptData.paymentlines,
