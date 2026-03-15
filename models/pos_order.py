@@ -6,19 +6,6 @@ import re
 class PosOrder(models.Model):
     _inherit = 'pos.order'
     @api.model
-    def log_order_lines(self, order):
-        _logger.info("=== Ticket POS ID: %s ===", order.id)
-        for line in order.lines:
-            _logger.info(
-                "Producto: %s | Cantidad: %s | Precio: %.2f | Descuento: %.2f | Subtotal: %.2f",
-                line.product_id.display_name,
-                line.qty,
-                line.price_unit,
-                line.discount,
-                line.price_subtotal
-            )
-        _logger.info("=== Fin Ticket POS ID: %s ===\n", order.id)
-    @api.model
     def l10n_do_get_ticket_fiscal_data(self, order_id=False, order_ref=False):
         order = self.env['pos.order']
         if order_id:
@@ -43,7 +30,7 @@ class PosOrder(models.Model):
                 'jamensoft_security_code': False,
                 'order_id': False,
             }
-        self.log_order_lines(order)
+        # log_order_lines eliminado (ya no se usa para depuración)
 
         ncf = ''
         if 'ncf' in order._fields:

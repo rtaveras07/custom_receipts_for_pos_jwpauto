@@ -105,7 +105,6 @@ patch(OrderReceipt.prototype, {
                     jamensoft_security_code = backendFiscalData.jamensoft_security_code || jamensoft_security_code;
                     // Integración: si el backend devuelve orderlines, usarlas en receiptData
                     if (Array.isArray(backendFiscalData.orderlines)) {
-                        console.log('[DEBUG] orderlines from backend:', backendFiscalData.orderlines);
                         receiptData.orderlines = backendFiscalData.orderlines;
                     }
                 } catch (_error) {
@@ -254,7 +253,6 @@ patch(OrderReceipt.prototype, {
         // Mapeo seguro de orderlines
         let mappedOrderlines;
         if (Array.isArray(receiptData.orderlines)) {
-            console.log('[DEBUG] mappedOrderlines from receiptData:', receiptData.orderlines);
             mappedOrderlines = receiptData.orderlines.map(line => ({
                 productName: line.productName || '',
                 qty: line.qty || 0,
