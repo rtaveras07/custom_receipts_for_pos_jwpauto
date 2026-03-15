@@ -87,8 +87,9 @@ patch(OrderReceipt.prototype, {
             let jamensoft_dgii_url = receiptData.jamensoft_dgii_url || "";
             let jamensoft_sign_date = receiptData.jamensoft_sign_date || "";
             let jamensoft_security_code = receiptData.jamensoft_security_code || "";
+            let jamensoft_status = receiptData.jamensoft_status || "";
 
-            if (!fiscal_number || !ncf_expiration_date || !fiscal_type_name || !jamensoft_qr_code || !jamensoft_sign_date || !jamensoft_security_code) {
+            if (!fiscal_number || !ncf_expiration_date || !fiscal_type_name || !jamensoft_qr_code || !jamensoft_sign_date || !jamensoft_security_code || !jamensoft_status) {
                 try {
                     const backendFiscalData = await this.orm.call(
                         "pos.order",
@@ -107,6 +108,11 @@ patch(OrderReceipt.prototype, {
                     if (Array.isArray(backendFiscalData.orderlines)) {
                         receiptData.orderlines = backendFiscalData.orderlines;
                     }
+                    // Si el backend devuelve jamensoft_status, propagarlo
+                    if (backendFiscalData.jamensoft_status) {
+                        receiptData.jamensoft_status = backendFiscalData.jamensoft_status;
+                        jamensoft_status = backendFiscalData.jamensoft_status;
+                    }
                 } catch (_error) {
                     // Fallback silencioso: usar datos locales si no hay RPC
                 }
@@ -121,6 +127,7 @@ patch(OrderReceipt.prototype, {
             this.state.jamensoft_dgii_url = jamensoft_dgii_url || "";
             this.state.jamensoft_sign_date = jamensoft_sign_date || "";
             this.state.jamensoft_security_code = jamensoft_security_code || "";
+            this.state.jamensoft_status = jamensoft_status || "";
         });
     },
     get templateProps() {
@@ -176,6 +183,10 @@ patch(OrderReceipt.prototype, {
         const jamensoft_security_code =
             receiptData.jamensoft_security_code ||
             this.state.jamensoft_security_code ||
+            '';
+        const jamensoft_status =
+            receiptData.jamensoft_status ||
+            this.state.jamensoft_status ||
             '';
         let fiscal_type_name =
             (fiscal_type && fiscal_type.name) ||
@@ -288,7 +299,8 @@ patch(OrderReceipt.prototype, {
             pos: this.pos,
             data: Object.assign({}, receiptData, {
                 total_discount,
-                has_discount
+                has_discount,
+                jamensoft_status,
             }),
             order: order,
             receipt: receiptData,
@@ -304,6 +316,7 @@ patch(OrderReceipt.prototype, {
             l10n_do_jamensoft_dgii_url: jamensoft_dgii_url,
             l10n_do_jamensoft_sign_date: jamensoft_sign_date,
             l10n_do_jamensoft_security_code: jamensoft_security_code,
+            l10n_do_jamensoft_status: jamensoft_status,
         };
     },
     get templateComponent() {

@@ -28,6 +28,7 @@ class PosOrder(models.Model):
                 'jamensoft_dgii_url': False,
                 'jamensoft_sign_date': False,
                 'jamensoft_security_code': False,
+                'jamensoft_status': '',
                 'order_id': False,
             }
         # log_order_lines eliminado (ya no se usa para depuración)
@@ -87,6 +88,8 @@ class PosOrder(models.Model):
                 jamensoft_sign_date = move.jamensoft_sign_date or False
             if 'jamensoft_security_code' in move._fields:
                 jamensoft_security_code = move.jamensoft_security_code or False
+            if 'jamensoft_status' in move._fields:
+                jamensoft_status = move.jamensoft_status or '----'    
 
         sequence_number = re.sub(r'^[A-Z]+', '', ncf or '')
         return {
@@ -98,6 +101,7 @@ class PosOrder(models.Model):
             'jamensoft_dgii_url': jamensoft_dgii_url,
             'jamensoft_sign_date': jamensoft_sign_date,
             'jamensoft_security_code': jamensoft_security_code,
+            'jamensoft_status': jamensoft_status,
             'order_id': order.id,
             'orderlines': [
                 {
