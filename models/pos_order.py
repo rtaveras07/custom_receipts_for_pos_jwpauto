@@ -101,7 +101,7 @@ class PosOrder(models.Model):
             'order_id': order.id,
             'orderlines': [
                 {
-                    'productName': line.product_id.display_name,
+                    'productName': re.sub(r'^\[[^\]]*\]\s*', '', line.product_id.display_name),
                     'qty': line.qty,
                     'unitPrice': line.price_unit,
                     'unit_name': line.product_id.uom_id.name if line.product_id.uom_id else '-',
