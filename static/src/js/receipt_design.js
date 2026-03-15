@@ -103,6 +103,11 @@ patch(OrderReceipt.prototype, {
                     jamensoft_dgii_url = backendFiscalData.jamensoft_dgii_url || jamensoft_dgii_url;
                     jamensoft_sign_date = backendFiscalData.jamensoft_sign_date || jamensoft_sign_date;
                     jamensoft_security_code = backendFiscalData.jamensoft_security_code || jamensoft_security_code;
+                    // Integración: si el backend devuelve orderlines, usarlas en receiptData
+                    if (Array.isArray(backendFiscalData.orderlines)) {
+                        console.log('[DEBUG] orderlines from backend:', backendFiscalData.orderlines);
+                        receiptData.orderlines = backendFiscalData.orderlines;
+                    }
                 } catch (_error) {
                     // Fallback silencioso: usar datos locales si no hay RPC
                 }
@@ -247,27 +252,35 @@ patch(OrderReceipt.prototype, {
         }
 
         // Mapeo seguro de orderlines
-        const mappedOrderlines = (order && order.orderlines) ? order.orderlines.map(line => {
-            return {
-                productName: line.product.name,
-                qty: line.quantity,
-                unitPrice: line.price,
-                unit_name: line.product.uom_id && line.product.uom_id[1] ? line.product.uom_id[1] : '-',
-                price: line.get_price_with_tax ? line.get_price_with_tax() : line.price,
-                tax_amount: (line.get_price_with_tax && line.get_price_without_tax) ? (line.get_price_with_tax() - line.get_price_without_tax()) : 0,
-                discount: line.discount || 0,
+        let mappedOrderlines;
+        if (Array.isArray(receiptData.orderlines)) {
+            console.log('[DEBUG] mappedOrderlines from receiptData:', receiptData.orderlines);
+            mappedOrderlines = receiptData.orderlines.map(line => ({
+                productName: line.productName || '',
+                qty: line.qty || 0,
+                unitPrice: line.unitPrice || 0.0,
+                unit_name: line.unit_name || '-',
+                price: line.price || 0.0,
+                tax_amount: line.tax_amount || 0.0,
+                discount: line.discount || 0.0,
                 customerNote: line.customerNote || '',
-            };
-        }) : (Array.isArray(receiptData.orderlines) ? receiptData.orderlines.map(line => ({
-            productName: line.productName || '',
-            qty: line.qty || 0,
-            unitPrice: line.unitPrice || 0.0,
-            unit_name: line.unit_name || '-',
-            price: line.price || 0.0,
-            tax_amount: line.tax_amount || 0.0,
-            discount: line.discount || 0.0,
-            customerNote: line.customerNote || '',
-        })) : []);
+            }));
+        } else if (order && order.orderlines) {
+            mappedOrderlines = order.orderlines.map(line => {
+                return {
+                    productName: line.product.name,
+                    qty: line.quantity,
+                    unitPrice: line.price,
+                    unit_name: line.product.uom_id && line.product.uom_id[1] ? line.product.uom_id[1] : '-',
+                    price: line.get_price_with_tax ? line.get_price_with_tax() : line.price,
+                    tax_amount: (line.get_price_with_tax && line.get_price_without_tax) ? (line.get_price_with_tax() - line.get_price_without_tax()) : 0,
+                    discount: line.discount || 0,
+                    customerNote: line.customerNote || '',
+                };
+            });
+        } else {
+            mappedOrderlines = [];
+        }
 
         // Calcular total_discount y has_discount
         const total_discount = mappedOrderlines.reduce((acc, l) => acc + ((l.unitPrice * l.qty * l.discount) / 100), 0);

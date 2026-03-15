@@ -1,9 +1,23 @@
 from odoo import api, models
+import logging
+_logger = logging.getLogger(__name__)
 import re
 
 class PosOrder(models.Model):
     _inherit = 'pos.order'
-
+    @api.model
+    def log_order_lines(self, order):
+        _logger.info("=== Ticket POS ID: %s ===", order.id)
+        for line in order.lines:
+            _logger.info(
+                "Producto: %s | Cantidad: %s | Precio: %.2f | Descuento: %.2f | Subtotal: %.2f",
+                line.product_id.display_name,
+                line.qty,
+                line.price_unit,
+                line.discount,
+                line.price_subtotal
+            )
+        _logger.info("=== Fin Ticket POS ID: %s ===\n", order.id)
     @api.model
     def l10n_do_get_ticket_fiscal_data(self, order_id=False, order_ref=False):
         order = self.env['pos.order']
@@ -29,6 +43,7 @@ class PosOrder(models.Model):
                 'jamensoft_security_code': False,
                 'order_id': False,
             }
+        self.log_order_lines(order)
 
         ncf = ''
         if 'ncf' in order._fields:
@@ -97,4 +112,17 @@ class PosOrder(models.Model):
             'jamensoft_sign_date': jamensoft_sign_date,
             'jamensoft_security_code': jamensoft_security_code,
             'order_id': order.id,
+            'orderlines': [
+                {
+                    'productName': line.product_id.display_name,
+                    'qty': line.qty,
+                    'unitPrice': line.price_unit,
+                    'unit_name': line.product_id.uom_id.name if line.product_id.uom_id else '-',
+                    'price': line.price_subtotal_incl,
+                    'tax_amount': (line.price_subtotal_incl - line.price_subtotal) if hasattr(line, 'price_subtotal_incl') and hasattr(line, 'price_subtotal') else 0.0,
+                    'discount': line.discount,
+                    'customerNote': getattr(line, 'customer_note', ''),
+                }
+                for line in order.lines
+            ],
         }
