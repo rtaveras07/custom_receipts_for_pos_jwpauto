@@ -236,10 +236,10 @@
                     <div style="font-size:12px; margin-top:4px;">Validar en DGII</div>
                 </div>
             </t>
-               <t t-if="props.data.jamensoft_status || props.l10n_do_jamensoft_status">
+               <t t-if="props.l10n_do_jamensoft_status != 'accepted'">
                 <div style="text-align:center; margin-top:8px; font-size:12px;">
                     <strong>Estado de validación:</strong>
-                    <t t-esc="props.data.jamensoft_status || props.l10n_do_jamensoft_status"/>
+                    <t t-esc="props.l10n_do_jamensoft_status"/>
                 </div>
             </t>
         </div>]]></field>
