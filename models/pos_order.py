@@ -79,6 +79,7 @@ class PosOrder(models.Model):
         jamensoft_dgii_url = False
         jamensoft_sign_date = False
         jamensoft_security_code = False
+        jamensoft_status = ''
         if move:
             if 'jamensoft_qr_code' in move._fields:
                 jamensoft_qr_code = move.jamensoft_qr_code or False
