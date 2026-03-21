@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Examples for receipt design: which can be used or modified -->
+    <!-- A PRODUCCION  -->
     <record id="pos_receipt_design1" model="pos.receipt">
         <field name="name">Design 1</field>
         <field name="design_receipt"><![CDATA[
@@ -111,7 +111,7 @@
                         <th style="text-align:right;">U/M</th>
                         <th style="text-align:right;">Price</th>
                         <th style="text-align:right;">Impuesto</th>
-                        <th style="text-align:right;">Amount</th>
+                        <th style="text-align:right;">Valor</th>
                     </tr>
                     <t t-if="props.orderlines and props.orderlines.length">
                         <tr t-foreach="props.orderlines" t-as="orderline" t-key="orderline_index">

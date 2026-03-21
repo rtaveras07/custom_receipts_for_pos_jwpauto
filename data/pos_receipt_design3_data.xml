@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Examples for receipt design: which can be used or modified -->
+    <record id="pos_receipt_design3" model="pos.receipt">
+        <field name="name">Design 3</field>
+        <field name="design_receipt"><![CDATA[
+        <div class="pos-receipt" style="font-family: monospace; max-width: 300px; margin: 0 auto;">
+            
+            <!-- Header - Company Info -->
+            <div class="pos-receipt-header" style="text-align: center; margin-bottom: 8px;">
+                <t t-if="props.data.headerData.company.name">
+                    <div style="font-size: 16px; font-weight: bold; margin-bottom: 4px;">
+                        <t t-esc="props.data.headerData.company.name" />
+                    </div>
+                </t>
+                <t t-if="(props.data.headerData.company and props.data.headerData.company.vat) || (props.pos and props.pos.company and props.pos.company.vat)">
+                    <div style="font-size: 12px;">
+                        <strong>RNC:</strong> 
+                        <t t-esc="(props.data.headerData.company and props.data.headerData.company.vat) || (props.pos and props.pos.company and props.pos.company.vat)"/>
+                    </div>
+                </t>
+            </div>
+            
+            <!-- Company Address -->
+            <t t-set="company_info" t-value="(props.data.headerData and props.data.headerData.company) || (props.pos and props.pos.company) || {}"/>
+            <div style="text-align: center; font-size: 11px; line-height: 1.4; margin-bottom: 6px;">
+                <div t-if="company_info.street || company_info.street2">
+                    <t t-esc="company_info.street || ''"/>
+                    <t t-if="company_info.street and company_info.street2">, </t>
+                    <t t-esc="company_info.street2 || ''"/>
+                </div>
+                <div t-if="company_info.city || company_info.state_name || company_info.country_name">
+                    <t t-esc="company_info.city || ''"/>
+                    <t t-if="company_info.city and (company_info.state_name || company_info.country_name)">, </t>
+                    <t t-esc="company_info.state_name || ''"/>
+                    <t t-if="company_info.state_name and company_info.country_name">, </t>
+                    <t t-esc="company_info.country_name || ''"/>
+                </div>
+                <div t-if="company_info.phone || company_info.mobile">
+                    Tel: <t t-esc="company_info.phone || company_info.mobile"/>
+                </div>
+            </div>
+            
+            <!-- Divider -->
+            <div style="border-top: 1px dashed #ccc; margin: 6px 0;"></div>
+            
+            <!-- Cashier Info -->
+            <t t-if="props.receipt.headerData.cashier">
+                <div style="text-align: center; font-size: 11px; margin-bottom: 6px;">
+                    <div>Atendido por: <strong><t t-esc="props.receipt.headerData.cashier" /></strong></div>
+                </div>
+                <div style="border-top: 1px dashed #ccc; margin: 6px 0;"></div>
+            </t>
+            
+            <!-- Tracking Number -->
+            <div t-if="props.data.headerData.trackingNumber" style="text-align: center; font-size: 12px; font-weight: bold; margin-bottom: 6px;">
+                <span>No. <t t-esc="props.data.headerData.trackingNumber" /></span>
+            </div>
+            
+            <!-- Customer Information -->
+            <div class="pos-receipt-customer" style="font-size: 11px; margin-bottom: 8px;">
+                <t t-if="props.partner and props.partner.name != ''">
+                    <div style="margin-bottom: 2px;"><strong>Cliente:</strong> <t t-esc="props.partner.name"/></div>
+                    <t t-if="props.partner.vat">
+                        <div style="margin-bottom: 2px;"><strong>RNC/Cédula:</strong> <t t-esc="props.partner.vat"/></div>
+                    </t>
+                    <t t-if="props.partner.street">
+                        <div style="margin-bottom: 2px;"><strong>Dirección:</strong> <t t-esc="props.partner.street"/></div>
+                    </t>
+                    <t t-if="props.partner.phone">
+                        <div style="margin-bottom: 2px;"><strong>Teléfono:</strong> <t t-esc="props.partner.phone"/></div>
+                    </t>
+                </t>
+            </div>
+            
+            <!-- Fiscal Information -->
+            <t t-if="props.data.ncf || props.l10n_do_fiscal_number">
+                <div style="font-size: 11px; border-top: 1px dashed #ccc; padding-top: 6px; margin-bottom: 8px;">
+                    <t t-if="props.data.fiscal_type_name || props.l10n_do_fiscal_type_name || (props.data.fiscal_type and props.data.fiscal_type.name)">
+                        <div style="margin-bottom: 2px;">
+                            <strong>Tipo de factura:</strong>
+                            <t t-esc="props.data.fiscal_type_name || props.l10n_do_fiscal_type_name || (props.data.fiscal_type and props.data.fiscal_type.name)"/>
+                        </div>
+                    </t>
+                    <div>
+                        <strong>NCF:</strong>
+                        <t t-esc="props.data.ncf || props.l10n_do_fiscal_number"/>
+                        <t t-if="props.data.ncf_expiration_date || props.l10n_do_ncf_expiration_date">
+                            <span> | Vence: </span>
+                            <t t-esc="props.data.ncf_expiration_date || props.l10n_do_ncf_expiration_date"/>
+                        </t>
+                    </div>
+                </div>
+            </t>
+            
+            <!-- Custom Header -->
+            <t t-if="props.receipt.headerData.header">
+                <div style="text-align: center; font-size: 11px; margin-bottom: 8px;">
+                    <t t-esc="props.receipt.headerData.header" />
+                </div>
+            </t>
+            
+            <!-- Order Lines Table -->
+            <div style="margin-bottom: 8px;">
+                <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 1px dashed #ccc;">
+                            <th style="text-align: center; padding: 4px 2px;">Cant/U.M</th>
+                            <th style="text-align: left; padding: 4px 2px;">Producto</th>
+                            <th style="text-align: right; padding: 4px 2px;">Precio</th>
+                            <th style="text-align: right; padding: 4px 2px;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-if="props.orderlines and props.orderlines.length">
+                            <tr t-foreach="props.orderlines" t-as="orderline" t-key="orderline_index">
+                                <td style="text-align: center; padding: 3px 2px; vertical-align: top;">
+                                    <div><t t-esc="orderline.qty"/></div>
+                                    <div style="font-size: 9px; color: #666;">
+                                        <t t-esc="orderline.unit_name || orderline.unitName || orderline.unit || '-'"/>
+                                    </div>
+                                </td>
+                                <td style="text-align: left; padding: 3px 2px;">
+                                    <div><t t-esc="orderline.productName"/></div>
+                                    <t t-if="orderline.discount > 0">
+                                        <div style="font-size: 10px; color: #666;">
+                                            <t t-esc="orderline.discount"/>% desc.
+                                        </div>
+                                    </t>
+                                    <t t-if="orderline.customerNote">
+                                        <div style="font-size: 10px; color: #666;" t-esc="orderline.customerNote"/>
+                                    </t>
+                                </td>
+                                <td style="text-align: right; padding: 3px 2px;">
+                                    <t t-esc="props.pos.env.utils.formatCurrency(orderline.unitPrice)"/>
+                                </td>
+                                <td style="text-align: right; padding: 3px 2px;">
+                                    <t t-esc="props.pos.env.utils.formatCurrency(orderline.price)"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Payment Methods -->
+            <t t-if="props.receipt.paymentlines and props.receipt.paymentlines.length">
+                <div style="border-top: 1px dashed #ccc; padding-top: 6px; margin-bottom: 6px;">
+                    <div style="font-weight: bold; margin-bottom: 4px;">Método(s) de pago:</div>
+                    <t t-foreach="props.receipt.paymentlines" t-as="payline" t-key="payline.cid">
+                        <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                            <span><t t-esc="payline.name"/></span>
+                            <span><t t-esc="props.pos.env.utils.formatCurrency(payline.amount)"/></span>
+                        </div>
+                    </t>
+                </div>
+            </t>
+            
+            <!-- Totals Section -->
+            <div style="border-top: 1px dashed #ccc; padding-top: 6px;">
+                <t t-set='taxincluded' t-value='Math.abs(props.receipt.amount_total - props.receipt.total_with_tax) &lt;= 0.000001' />
+                <t t-if='!taxincluded'>
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
+                        <span>Subtotal:</span>
+                        <span t-esc='props.pos.env.utils.formatCurrency(props.data.total_without_tax)'/>
+                    </div>
+                    <t t-foreach='props.data.tax_details' t-as='tax' t-key="tax.tax.id">
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
+                            <span><t t-esc='tax.name' /></span>
+                            <span t-esc='props.pos.env.utils.formatCurrency(tax.amount)'/>
+                        </div>
+                    </t>
+                </t>
+                <t t-if="props.data.has_discount">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
+                        <span>Descuento total:</span>
+                        <span t-esc="props.pos.env.utils.formatCurrency(props.data.total_discount)"/>
+                    </div>
+                </t>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; margin-top: 6px; padding-top: 4px; border-top: 1px solid #000;">
+                    <span>TOTAL:</span>
+                    <span t-esc='props.pos.env.utils.formatCurrency(props.data.amount_total)'/>
+                </div>
+            </div>
+            
+            <!-- Order Metadata -->
+            <div style="text-align: center; font-size: 10px; margin-top: 10px; padding-top: 6px; border-top: 1px dashed #ccc;">
+                <div><t t-esc="props.receipt.name" /></div>
+                <div t-if="props.receipt.date"><t t-esc="props.receipt.date" /></div>
+            </div>
+            
+            <!-- Footer Message -->
+            <div style="text-align: center; font-size: 11px; margin: 10px 0;">
+                ¡Gracias por su compra!
+            </div>
+            
+            <!-- Fiscal Validation Info -->
+            <t t-if="props.data.jamensoft_sign_date || props.l10n_do_jamensoft_sign_date || props.data.jamensoft_security_code || props.l10n_do_jamensoft_security_code">
+                <div style="text-align: center; font-size: 9px; border-top: 1px dashed #ccc; padding-top: 6px;">
+                    <t t-if="props.data.jamensoft_sign_date || props.l10n_do_jamensoft_sign_date">
+                        <div>Firma: <t t-esc="props.data.jamensoft_sign_date || props.l10n_do_jamensoft_sign_date"/></div>
+                    </t>
+                    <t t-if="props.data.jamensoft_security_code || props.l10n_do_jamensoft_security_code">
+                        <div>Código: <t t-esc="props.data.jamensoft_security_code || props.l10n_do_jamensoft_security_code"/></div>
+                    </t>
+                </div>
+            </t>
+            
+            <!-- QR Code -->
+            <t t-if="props.data.jamensoft_qr_code || props.l10n_do_jamensoft_qr_code">
+                <div style="text-align: center; margin-top: 8px;">
+                    <img t-att-src="'data:image/png;base64,' + (props.data.jamensoft_qr_code || props.l10n_do_jamensoft_qr_code)" style="max-width: 120px; max-height: 120px;"/>
+                    <div style="font-size: 9px;">Validar en DGII</div>
+                </div>
+            </t>
+            
+            <!-- Validation Status -->
+            <t t-if="props.l10n_do_jamensoft_status != 'accepted'">
+                <div style="text-align: center; font-size: 9px; margin-top: 4px;">
+                    <strong>Estado:</strong> <t t-esc="props.l10n_do_jamensoft_status"/>
+                </div>
+            </t>
+        </div>]]></field>
+    </record>
+</odoo>
