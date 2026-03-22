@@ -50,6 +50,7 @@ patch(OrderReceipt.prototype, {
         })
         this.pos = useState(useService("pos"));
         this.orm = useService("orm");
+        this.notification = useService("notification");
 
         onWillStart(async () => {
             const order = this.props.order || this.pos.get_order();
@@ -128,6 +129,29 @@ patch(OrderReceipt.prototype, {
             this.state.jamensoft_sign_date = jamensoft_sign_date || "";
             this.state.jamensoft_security_code = jamensoft_security_code || "";
             this.state.jamensoft_status = jamensoft_status || "";
+
+            // DGII notification toast logic
+            setTimeout(() => {
+                if (this._dgii_notified) return;
+                const status = this.state.jamensoft_status;
+                if (status === "accepted") {
+                    this.notification.add("Factura validada por DGII ✔", {
+                        type: "success",
+                        sticky: false
+                    });
+                } else if (status === "error" || status === "rejected") {
+                    this.notification.add("No hay configuración para envío a DGII ❌", {
+                        type: "danger",
+                        sticky: true
+                    });
+                } else if (status) {
+                    this.notification.add("Enviando comprobante a DGII...", {
+                        type: "warning",
+                        sticky: false
+                    });
+                }
+                this._dgii_notified = true;
+            }, 0);
         });
     },
     get templateProps() {
