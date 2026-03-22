@@ -181,6 +181,13 @@
                     <span>TOTAL:</span>
                     <span t-esc='props.pos.env.utils.formatCurrency(props.data.amount_total)'/>
                 </div>
+                <!-- Cambio (vuelto) -->
+                <t t-if="props.data.change || props.receipt.change">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: bold; margin-top: 2px;">
+                        <span>Cambio:</span>
+                        <span t-esc="props.pos.env.utils.formatCurrency(props.data.change || props.receipt.change)"/>
+                    </div>
+                </t>
             </div>
             
             <!-- Order Metadata -->
