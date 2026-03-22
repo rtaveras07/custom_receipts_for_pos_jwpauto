@@ -163,7 +163,10 @@ patch(OrderReceipt.prototype, {
             name: partner.name,
             vat: partner.vat,
             street: partner.street,
+            street2: partner.street2,
             city: partner.city,
+            state_name: partner.state_id && partner.state_id[1] ? partner.state_id[1] : '',
+            country_name: partner.country_id && partner.country_id[1] ? partner.country_id[1] : '',
             phone: partner.phone,
             email: partner.email,
         } : { name: "" };
@@ -319,6 +322,24 @@ patch(OrderReceipt.prototype, {
         const total_discount = mappedOrderlines.reduce((acc, l) => acc + ((l.unitPrice * l.qty * l.discount) / 100), 0);
         const has_discount = mappedOrderlines.some(l => l.discount && l.discount > 0);
 
+        // Datos de la compañía para el template (incluyendo todos los campos relevantes)
+        let company = (this.pos && this.pos.company) || (this.pos && this.pos.config && this.pos.config.company) || {};
+        // Si company está anidado en config, tomar el objeto correcto
+        if (company.company) {
+            company = company.company;
+        }
+        const companyData = {
+            name: company.name || '',
+            vat: company.vat || '',
+            street: company.street || '',
+            street2: company.street2 || '',
+            city: company.city || '',
+            state_name: (company.state_id && (Array.isArray(company.state_id) ? company.state_id[1] : company.state_id.name)) || '',
+            country_name: (company.country_id && (Array.isArray(company.country_id) ? company.country_id[1] : company.country_id.name)) || '',
+            phone: company.phone || '',
+            mobile: company.mobile || '',
+            email: company.email || '',
+        };
         return {
             pos: this.pos,
             data: Object.assign({}, receiptData, {
@@ -331,6 +352,7 @@ patch(OrderReceipt.prototype, {
             orderlines: mappedOrderlines,
             paymentlines: receiptData.paymentlines,
             partner: partnerData,
+            company: companyData,
             l10n_do_fiscal_number: fiscal_number,
             l10n_do_ncf_sequence_number: ncf_sequence_number,
             l10n_do_ncf_expiration_date: ncf_expiration_date,

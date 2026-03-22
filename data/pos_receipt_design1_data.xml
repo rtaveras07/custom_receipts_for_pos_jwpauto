@@ -20,22 +20,39 @@
                
             </div>
             <br/>
+           
             <t t-set="company_info" t-value="(props.data.headerData and props.data.headerData.company) || (props.pos and props.pos.company) || {}"/>
-            <div style="text-align: center; font-size: 12px;" t-if="company_info.street || company_info.street2">
-                <t t-esc="company_info.street || ''"/>
-                <t t-if="company_info.street and company_info.street2">, </t>
-                <t t-esc="company_info.street2 || ''"/>
+            <div style="text-align: center; font-size: 12px;" t-if="props.company.street">
+                <span><t t-esc="props.company.street"/></span>
             </div>
-            <div style="text-align: center; font-size: 12px;" t-if="company_info.city || company_info.state_name || company_info.country_name">
-                <t t-esc="company_info.city || ''"/>
-                <t t-if="company_info.city and (company_info.state_name || company_info.country_name)">, </t>
-                <t t-esc="company_info.state_name || ''"/>
-                <t t-if="company_info.state_name and company_info.country_name">, </t>
-                <t t-esc="company_info.country_name || ''"/>
+            <div style="text-align: center; font-size: 12px;" t-if="props.company.street2 || props.company.city || props.company.state_name || props.company.country_name">
+                <t t-if="props.company.street2">
+                    <t t-esc="props.company.street2"/>
+                </t>
+                <t t-if="props.company.city">
+                    <t t-if="props.company.street2">, </t>
+                    <t t-esc="props.company.city"/>
+                </t>
+                <t t-if="props.company.state_name">
+                    <t t-if="props.company.street2 || props.company.city">, </t>
+                    <t t-esc="props.company.state_name"/>
+                </t>
+                <t t-if="props.company.country_name">
+                    <t t-if="props.company.street2 || props.company.city || props.company.state_name">, </t>
+                    <t t-esc="props.company.country_name"/>
+                </t>
             </div>
-            <div style="text-align: center; font-size: 12px;" t-if="company_info.phone || company_info.mobile">
-                Tel.: <t t-esc="company_info.phone || company_info.mobile"/>
+            <div style="text-align: center; font-size: 12px;" t-if="props.company.phone || props.company.mobile">
+                <t t-if="props.company.phone">Tel.: <t t-esc="props.company.phone"/></t>
+                <t t-if="props.company.mobile">
+                    <t t-if="props.company.phone"> | </t>
+                    Cel.: <t t-esc="props.company.mobile"/>
+                </t>
             </div>
+            <div style="text-align: center; font-size: 12px;" t-if="props.company.email">
+                Email: <t t-esc="props.company.email"/>
+            </div>
+         
             <div style="text-align: center; font-size: 12px;">
              <t t-if="props.receipt.headerData.cashier">
                     <div class="cashier">
