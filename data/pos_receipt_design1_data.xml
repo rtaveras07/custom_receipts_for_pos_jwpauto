@@ -154,7 +154,7 @@
              <t t-if="props.receipt.paymentlines and props.receipt.paymentlines.length">
     <div style="border-top:1px dashed black; font-weight: 600; font-size:14px; margin-top:10px;">
         <div>Método(s) de pago:</div>
-        <t t-foreach="props.receipt.paymentlines" t-as="payline" t-key="payline.cid">
+          <t t-foreach="props.receipt.paymentlines" t-as="payline" t-key="payline_index" t-foreach-index="payline_index">
             <div style="display: flex; justify-content: space-between;">
                 <span><t t-esc="payline.name"/></span>
                 <span><t t-esc="props.pos.env.utils.formatCurrency(payline.amount)"/></span>
