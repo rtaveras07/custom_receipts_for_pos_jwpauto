@@ -47,7 +47,9 @@ patch(OrderReceipt.prototype, {
             jamensoft_dgii_url: "",
             jamensoft_sign_date: "",
             jamensoft_security_code: "",
-        })
+            jamensoft_status: "",
+            companyFull: {},
+        });
         this.pos = useState(useService("pos"));
         this.orm = useService("orm");
         this.notification = useService("notification");
@@ -90,6 +92,31 @@ patch(OrderReceipt.prototype, {
             let jamensoft_security_code = receiptData.jamensoft_security_code || "";
             let jamensoft_status = receiptData.jamensoft_status || "";
 
+            // --- Cargar datos completos de la compañía vía ORM ---
+            let companyFull = {};
+            try {
+                const company_id = this.pos.company && this.pos.company.id;
+                if (company_id) {
+                    const [result] = await this.orm.call(
+                        "res.company",
+                        "read",
+                        [[company_id], [
+                            "street", "street2", "city", "phone", "mobile", "email", "vat", "name"
+                        ]]
+                    );
+                    if (result) {
+                        companyFull = result;
+                        this.state.companyFull = result;
+                    }
+                }
+            } catch (err) {
+                // Si falla, dejar companyFull vacío
+                this.state.companyFull = {};
+                console.warn("[POS RECEIPT] Error cargando datos completos de la compañía:", err);
+            }
+            // --- Fin carga compañía ---
+
+            // Fiscal data (igual que antes)
             if (!fiscal_number || !ncf_expiration_date || !fiscal_type_name || !jamensoft_qr_code || !jamensoft_sign_date || !jamensoft_security_code || !jamensoft_status) {
                 try {
                     const backendFiscalData = await this.orm.call(
@@ -105,11 +132,9 @@ patch(OrderReceipt.prototype, {
                     jamensoft_dgii_url = backendFiscalData.jamensoft_dgii_url || jamensoft_dgii_url;
                     jamensoft_sign_date = backendFiscalData.jamensoft_sign_date || jamensoft_sign_date;
                     jamensoft_security_code = backendFiscalData.jamensoft_security_code || jamensoft_security_code;
-                    // Integración: si el backend devuelve orderlines, usarlas en receiptData
                     if (Array.isArray(backendFiscalData.orderlines)) {
                         receiptData.orderlines = backendFiscalData.orderlines;
                     }
-                    // Si el backend devuelve jamensoft_status, propagarlo
                     if (backendFiscalData.jamensoft_status) {
                         receiptData.jamensoft_status = backendFiscalData.jamensoft_status;
                         jamensoft_status = backendFiscalData.jamensoft_status;
@@ -152,6 +177,12 @@ patch(OrderReceipt.prototype, {
                 }
                 this._dgii_notified = true;
             }, 0);
+
+            // // Debug logs
+            // if (typeof window !== 'undefined' && window.console) {
+            //     console.log('[POS RECEIPT] companyFull (backend):', this.state.companyFull);
+            //     console.log('[POS RECEIPT] this.pos.company:', this.pos.company);
+            // }
         });
     },
     get templateProps() {
@@ -322,23 +353,24 @@ patch(OrderReceipt.prototype, {
         const total_discount = mappedOrderlines.reduce((acc, l) => acc + ((l.unitPrice * l.qty * l.discount) / 100), 0);
         const has_discount = mappedOrderlines.some(l => l.discount && l.discount > 0);
 
-        // Datos de la compañía para el template (incluyendo todos los campos relevantes)
+        // Datos de la compañía: priorizar los del backend (companyFull) sobre los del POS
         let company = (this.pos && this.pos.company) || (this.pos && this.pos.config && this.pos.config.company) || {};
-        // Si company está anidado en config, tomar el objeto correcto
         if (company.company) {
             company = company.company;
         }
+        const companyFull = this.state.companyFull || {};
         const companyData = {
-            name: company.name || '',
-            vat: company.vat || '',
-            street: company.street || '',
-            street2: company.street2 || '',
-            city: company.city || '',
-            state_name: (company.state_id && (Array.isArray(company.state_id) ? company.state_id[1] : company.state_id.name)) || '',
-            country_name: (company.country_id && (Array.isArray(company.country_id) ? company.country_id[1] : company.country_id.name)) || '',
-            phone: company.phone || '',
-            mobile: company.mobile || '',
-            email: company.email || '',
+            name: companyFull.name || company.name || '',
+            vat: companyFull.vat || company.vat || '',
+            street: companyFull.street || company.street || '',
+            street2: companyFull.street2 || company.street2 || '',
+            city: companyFull.city || company.city || '',
+            phone: companyFull.phone || company.phone || '',
+            mobile: companyFull.mobile || company.mobile || '',
+            email: companyFull.email || company.email || '',
+            // Los siguientes campos pueden no estar en companyFull
+            state_name: company.state_id && (Array.isArray(company.state_id) ? company.state_id[1] : company.state_id.name) || '',
+            country_name: company.country_id && (Array.isArray(company.country_id) ? company.country_id[1] : company.country_id.name) || '',
         };
         return {
             pos: this.pos,

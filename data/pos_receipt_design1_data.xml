@@ -25,20 +25,19 @@
             <div style="text-align: center; font-size: 12px;" t-if="props.company.street">
                 <span><t t-esc="props.company.street"/></span>
             </div>
-            <div style="text-align: center; font-size: 12px;" t-if="props.company.street2 || props.company.city || props.company.state_name || props.company.country_name">
-                <t t-if="props.company.street2">
-                    <t t-esc="props.company.street2"/>
-                </t>
+            <div style="text-align: center; font-size: 12px;" t-if="props.company.street2">
+                <span><t t-esc="props.company.street2"/></span>
+            </div>
+            <div style="text-align: center; font-size: 12px;" t-if="props.company.city || props.company.state_name || props.company.country_name">
                 <t t-if="props.company.city">
-                    <t t-if="props.company.street2">, </t>
                     <t t-esc="props.company.city"/>
                 </t>
                 <t t-if="props.company.state_name">
-                    <t t-if="props.company.street2 || props.company.city">, </t>
+                    <t t-if="props.company.city">, </t>
                     <t t-esc="props.company.state_name"/>
                 </t>
                 <t t-if="props.company.country_name">
-                    <t t-if="props.company.street2 || props.company.city || props.company.state_name">, </t>
+                    <t t-if="props.company.city || props.company.state_name">, </t>
                     <t t-esc="props.company.country_name"/>
                 </t>
             </div>
