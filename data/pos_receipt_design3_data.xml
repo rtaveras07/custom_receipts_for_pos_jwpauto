@@ -157,6 +157,7 @@
                                 </td>
                                 <td style="text-align: right; padding: 3px 2px;">
                                     <t t-esc="props.pos.env.utils.formatCurrency(orderline.price)"/>
+                                    <t t-if="orderline.tax_amount === 0"> - E</t>
                                 </td>
                             </tr>
                         </t>

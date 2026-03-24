@@ -160,6 +160,7 @@
                             <td style="text-align:center;">
                                 <t t-if="(orderline.price !== undefined &amp;&amp; orderline.price !== null &amp;&amp; typeof orderline.price === 'number') || (orderline.priceDisplay !== undefined &amp;&amp; orderline.priceDisplay !== null &amp;&amp; typeof orderline.priceDisplay === 'number') || (orderline.unitPrice !== undefined &amp;&amp; orderline.unitPrice !== null &amp;&amp; typeof orderline.unitPrice === 'number')">
                                     <t t-esc="props.pos.env.utils.formatCurrency(orderline.price || orderline.priceDisplay || orderline.unitPrice)"/>
+                                    <t t-if="orderline.tax_amount === 0"> - E</t>
                                 </t>
                                 <t t-else="">-</t>
                             </td>
