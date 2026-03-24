@@ -121,8 +121,10 @@
                         <tr style="border-bottom: 1px dashed #ccc;">
                             <th style="text-align: center; padding: 4px 2px;">Cant/U.M</th>
                             <th style="text-align: left; padding: 4px 2px;">Producto</th>
-                            <th style="text-align: right; padding: 4px 2px;">Precio</th>
-                            <th style="text-align: right; padding: 4px 2px;">ITBIS</th>
+                            <th style="text-align: right; padding: 4px 2px;">
+                                <div>Precio</div>
+                                <div style="font-size:10px; font-weight:normal;">ITBIS</div>
+                            </th>
                             <th style="text-align: right; padding: 4px 2px;">Total</th>
                         </tr>
                     </thead>
@@ -147,13 +149,13 @@
                                     </t>
                                 </td>
                                 <td style="text-align: right; padding: 3px 2px;">
-                                    <t t-esc="props.pos.env.utils.formatCurrency(orderline.unitPrice)"/>
-                                </td>
-                                <td style="text-align: right; padding: 3px 2px;">
-                                    <t t-if="orderline.tax_amount !== undefined &amp;&amp; orderline.tax_amount !== null &amp;&amp; typeof orderline.tax_amount === 'number'">
-                                        <t t-esc="props.pos.env.utils.formatCurrency(orderline.tax_amount)"/>
-                                    </t>
-                                    <t t-else="">-</t>
+                                    <div><t t-esc="props.pos.env.utils.formatCurrency(orderline.unitPrice)"/></div>
+                                    <div style="font-size: 9px; color: #666;">
+                                        <t t-if="orderline.tax_amount !== undefined &amp;&amp; orderline.tax_amount !== null &amp;&amp; typeof orderline.tax_amount === 'number'">
+                                            <t t-esc="props.pos.env.utils.formatCurrency(orderline.tax_amount)"/>
+                                        </t>
+                                        <t t-else="">-</t>
+                                    </div>
                                 </td>
                                 <td style="text-align: right; padding: 3px 2px;">
                                     <t t-esc="props.pos.env.utils.formatCurrency(orderline.price)"/>
